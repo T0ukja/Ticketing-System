@@ -1,0 +1,74 @@
+﻿@page "/tickets"
+@using Microsoft.Exchange.WebServices.Data;
+@using System.Collections.ObjectModel;
+@using BlazorApp1.Data
+@using System.Threading;
+ @using System.Timers;
+
+@inject Emails Emailing
+@inject IJSRuntime JSRuntime
+<PageTitle>TkSystem</PageTitle>
+
+<h1>Uudet tiketit</h1>
+
+<h1>@unreadedmails.Count()</h1>
+@foreach(EmailMessage message in unreadedmails)
+{
+    <ul>
+        <li>
+            @message.Subject
+        </li>
+    <button class="btn btn-primary" @onclick="Checkdata">Katso tiedot</button>
+
+    </ul>
+}
+
+
+
+@code {
+    private static System.Timers.Timer aTimer;
+
+    private void Checkdata()
+    {
+        
+    }
+
+   private List<EmailMessage> unreadedmails;
+    PeriodicTimer periodicTimer = new (TimeSpan.FromSeconds(15));
+    
+    protected override async void OnInitialized()
+    {
+
+        unreadedmails = Emailing.Getemails();
+        RunTimer();  
+
+
+        //  unreadedmails = Emailing.Getemails();
+    }
+    async void RunTimer()
+    {
+        while (await periodicTimer.WaitForNextTickAsync()) {
+            List<EmailMessage> unreadedcheck = Emailing.Getemails();
+
+            if(unreadedcheck.Count() != unreadedmails.Count()){
+
+                unreadedmails = Emailing.Getemails();
+                StateHasChanged();
+
+            }
+            
+        }    
+    }
+    //<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+//<button class="btn btn-primary" @onclick="Moro">Click mee</button>
+
+
+public void Dispose()
+{
+   periodicTimer?.Dispose();
+}
+ 
+    
+}}
+
+

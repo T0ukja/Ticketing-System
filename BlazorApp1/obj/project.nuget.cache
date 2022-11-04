@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "dgSpecHash": "wbvOrMzHHgj9T4ZuMXf9gQgCje+hU9bw/X+UOMZj6IDuKs0A2/1sOMu+qW/EEb5Ny/XPLg1b8/2TSM8E1bVl8w==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Janne\\Documents\\tehtavat2022\\Syksy\\Ticketing-System\\BlazorApp1\\BlazorApp1.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Janne\\.nuget\\packages\\microsoft.exchange.webservices\\2.2.0\\microsoft.exchange.webservices.2.2.0.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Microsoft.Exchange.WebServices 2.2.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework 'net6.0'. This package may not be fully compatible with your project.",
+      "libraryId": "Microsoft.Exchange.WebServices",
+      "targetGraphs": [
+        "net6.0"
+      ]
+    }
+  ]
+}
