@@ -17,9 +17,27 @@
     <ul>
         <li>
             @message.Subject
-        </li>
-    <button class="btn btn-primary" @onclick="Checkdata">Katso tiedot</button>
 
+        </li>
+    <button class="btn btn-primary" @onclick="() => Checkdata(message.Id.ToString())">Katso tiedot</button>
+        @if(emailchain != null)
+        {
+ 
+            @foreach (Item item in emailchain[0].Items)
+                    {
+                        <ul>
+                            @item.Subject
+                            @item.TextBody.Text
+                            </ul>
+                        Console.WriteLine("   Item ID: " + item.Id.UniqueId);
+                        Console.WriteLine("   Subject: " + item.Subject);
+                        Console.WriteLine("   Sender: " + item.IsFromMe);
+                        Console.WriteLine("   Received: " + item.DateTimeReceived);
+                        Console.WriteLine("   Body: " + item.TextBody.Text);
+                       
+                    }
+            
+        }
     </ul>
 }
 
@@ -28,10 +46,13 @@
 @code {
     private static System.Timers.Timer aTimer;
 
-    private void Checkdata()
+    private void Checkdata(string id)
     {
-        
+        emailchain = Emailing.getconversion(id);
     }
+
+    private List<ConversationNode> emailchain;
+    // private Collection<Item> emailchain; 
 
    private List<EmailMessage> unreadedmails;
     PeriodicTimer periodicTimer = new (TimeSpan.FromSeconds(15));
