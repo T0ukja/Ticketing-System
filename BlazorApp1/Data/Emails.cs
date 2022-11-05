@@ -13,7 +13,7 @@ namespace BlazorApp1.Data
         //  public Collection<Item>? getconversion(string messageid)
         {
          
-            string[] credentials = File.ReadAllText(@".\credentials.txt").Split(new[] { ' ' }); ;
+            string[] credentials = File.ReadAllText(@".\Cred.txt").Split(new[] { ' ' }); ;
             string emailaddress = credentials[0];
             string password = credentials[1];
             string emailurl = credentials[2];
@@ -81,7 +81,7 @@ namespace BlazorApp1.Data
 //*****************************************************************************************
         public List<EmailMessage>? Getemails()
         {
-            string[] credentials = File.ReadAllText(@".\credentials.txt").Split(new[] { ' ' }); ;
+            string[] credentials = File.ReadAllText(@".\Cred.txt").Split(new[] { ' ' }); ;
             string emailaddress = credentials[0];
             string password = credentials[1];
             string emailurl = credentials[2];
