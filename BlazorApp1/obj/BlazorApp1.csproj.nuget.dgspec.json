@@ -43,6 +43,14 @@
             "Microsoft.Exchange.WebServices": {
               "target": "Package",
               "version": "[2.2.0, )"
+            },
+            "MongoDB.Bson": {
+              "target": "Package",
+              "version": "[2.18.0, )"
+            },
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[2.18.0, )"
             }
           },
           "imports": [

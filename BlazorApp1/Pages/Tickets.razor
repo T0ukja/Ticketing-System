@@ -4,7 +4,7 @@
 @using BlazorApp1.Data
 @using System.Threading;
  @using System.Timers;
-
+@using BlazorApp1.Models;
 @inject Emails Emailing
 @inject IJSRuntime JSRuntime
 <PageTitle>TkSystem</PageTitle>
@@ -15,130 +15,122 @@
 
 <h1>Uudet tiketit</h1>
 
-<h1>@unreadedmails.Count()</h1>
-@foreach(EmailMessage message in unreadedmails)
+<h1>@mongodblist.Count()</h1>
+@foreach (Datamodel message in mongodblist)
 {
-    <ul>
-        <li>
-            @message.Subject
-
-        </li>
-    <button class="btn btn-primary" @onclick="() => Checkdata(message.Id.ToString())">Katso tiedot</button>
-        @if(emailchain != null && message.Id.ToString().Equals(emailid) && ShowPopUp)
-        {
- <div class="modal" tabindex="-1" style="display:block" role="dialog">
-     <div class="modal-dialog">
-         <div class="modal-content">
-             <div class="modal-header">
-                 <h1>
-                     @message.Subject
-                 </h1>
-                 <button type="button" class="close" @onclick="()=> ClosePopup()"> Close</button>
-             </div>
-             <div class="modal-body" id="listitems">
-                  @foreach (Item item in emailchain[0].Items)
-                    {
-                        <ul b-3xxtam6d07>
-                          
-                            @item.TextBody.Text
-                            </ul>
-                     
-                       
-                    }
-             </div>
-         </div>
-     </div>
- </div>
-           
-            
-        }
-    </ul>
+	<ul>
+		<li>
+			@message.subject
+		</li>
 
 
 
 
-@code {
+		<button class="btn btn-primary" @onclick="() => Checkdata(message.message_id.ToString())">Katso tiedot</button>
+		@if (emailchain != null && message.message_id.ToString().Equals(emailid) && ShowPopUp)
+		{
+			<div class="modal" tabindex="-1" style="display:block" role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1>
+								@message.subject
+							</h1>
+							<button type="button" class="close" @onclick="()=> ClosePopup()"> Close</button>
+						</div>
+						<div class="modal-body" id="listitems">
+							@foreach (Item item in emailchain[0].Items)
+							{
+								<ul b-3xxtam6d07>
+
+									@item.TextBody.Text
+								</ul>
 
 
-     /*
-     *  @if(emailchain != null && message.Id.ToString().Equals(emailid))
-                            {
+							}
+						</div>
+					</div>
+				</div>
+			</div>
 
-                            @foreach (Item item in emailchain[0].Items)
-                            {
-                            <ul>
-                        @item.Subject
-                        @item.TextBody.Text
-                        </ul>
-                        Console.WriteLine("   Item ID: " + item.Id.UniqueId);
-                        Console.WriteLine("   Subject: " + item.Subject);
-                        Console.WriteLine("   Sender: " + item.IsFromMe);
-                        Console.WriteLine("   Received: " + item.DateTimeReceived);
-                        Console.WriteLine("   Body: " + item.TextBody.Text);
 
-    }
-
-    }
-    * 
-    */
-    private static System.Timers.Timer aTimer;
-
-    private void Checkdata(string id)
-    {
-        emailchain = Emailing.getconversion(id);
-        emailid = id;
-        ShowPopUp = true;
-
-    }
-    private string emailid;
-    private List<ConversationNode> emailchain;
-    // private Collection<Item> emailchain; 
-
-    private List<EmailMessage> unreadedmails;
-    PeriodicTimer periodicTimer = new (TimeSpan.FromSeconds(15));
+		}
+	</ul>
 
 
 
-    protected override async void OnInitialized()
-    {
 
-        unreadedmails = Emailing.Getemails();
-        RunTimer();  
-
-
-        //  unreadedmails = Emailing.Getemails();
-    }
-    bool ShowPopUp = false;
-    void ClosePopup()
-    {
-        ShowPopUp = false;
-                        StateHasChanged();
-
-    }
-    async void RunTimer()
-    {
-        while (await periodicTimer.WaitForNextTickAsync()) {
-            List<EmailMessage> unreadedcheck = Emailing.Getemails();
-
-            if(unreadedcheck.Count() != unreadedmails.Count()){
-
-                unreadedmails = Emailing.Getemails();
-                StateHasChanged();
-
-            }
-            
-        }    
-    }
-    //<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
-//<button class="btn btn-primary" @onclick="Moro">Click mee</button>
+	@code {
+	// Timer variable declaration.
+	private static System.Timers.Timer aTimer;
+	// This is variable is used to get id of conversation which is later compared to dialog email id.
+	private string emailid;
+	// List which is used to get objects from MongoDB database collection.
+	private List<Datamodel> mongodblist;
+	// Used to loop email conversation messages.
+	private List<ConversationNode> emailchain;
+	// Timer which is assigned 15 seconds (Updates every 5 seconds).
+	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(5));
+	// bool variable for dialog state.
+	bool ShowPopUp = false;
 
 
-public void Dispose()
-{
-   periodicTimer?.Dispose();
+	// This function is called when pressing more information about ticket.
+	private void Checkdata(string id)
+	{
+		// Getting conversation of email to list.
+		emailchain = Emailing.getconversion(id);
+		// Assigning id, which is compared later in dialog.
+		emailid = id;
+		// This opens dialog when true.
+		ShowPopUp = true;
+
+	}
+
+
+
+
+	protected override async void OnInitialized()
+	{
+		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
+		mongodblist = Emailing.GetmessagesdbAsync();
+		// Starts 5 second timer.
+		RunTimer();
+
+	}
+	void ClosePopup()
+	{
+		// Changes value to false to shutdown dialog module
+		ShowPopUp = false;
+		// Changes website state without reload.
+		StateHasChanged();
+
+	}
+	async void RunTimer()
+	{
+		// Timer function.
+		while (await periodicTimer.WaitForNextTickAsync())
+		{
+			// Get new emails and updates list.
+			Emailing.Getemails();
+			mongodblist = Emailing.GetmessagesdbAsync();
+
+			StateHasChanged();
+
+
+
+		}
+	}
+
+
+	// Dispose function, maybe needed later.
+	public void Dispose()
+	{
+		periodicTimer?.Dispose();
+	}
+
+
 }
- 
-    
-}}
+}
 
 

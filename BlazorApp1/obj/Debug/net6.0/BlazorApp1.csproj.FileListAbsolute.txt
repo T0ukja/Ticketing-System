@@ -58,3 +58,14 @@ C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\obj\Debu
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\obj\Debug\net6.0\scopedcss\projectbundle\BlazorApp1.bundle.scp.css
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\obj\Debug\net6.0\BlazorApp1.csproj.CopyComplete
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\obj\Debug\net6.0\BlazorApp1.genruntimeconfig.cache
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\DnsClient.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\MongoDB.Bson.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\MongoDB.Driver.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\MongoDB.Driver.Core.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\MongoDB.Libmongocrypt.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\SharpCompress.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Snappier.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\ZstdSharp.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\runtimes\linux\native\libmongocrypt.so
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\runtimes\osx\native\libmongocrypt.dylib
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\runtimes\win\native\mongocrypt.dll

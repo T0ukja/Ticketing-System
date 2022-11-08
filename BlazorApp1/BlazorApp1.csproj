@@ -7,7 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\css\StyleSheet.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Exchange.WebServices" Version="2.2.0" />
+    <PackageReference Include="MongoDB.Bson" Version="2.18.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.18.0" />
   </ItemGroup>
 
 </Project>

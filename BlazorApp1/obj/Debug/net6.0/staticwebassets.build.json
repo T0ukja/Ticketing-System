@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "2XUnaDy9XPFXcr4yHFO83/eCq1t3lO2q2cd7zi9lVQY=",
+  "Hash": "C5NPieUxpQ7HFIcqy4DFqn7fkePyyIONs4jhlafW8JE=",
   "Source": "BlazorApp1",
   "BasePath": "_content/BlazorApp1",
   "Mode": "Default",
@@ -253,6 +253,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
+    },
+    {
+      "Identity": "C:\\Users\\Janne\\Documents\\tehtavat2022\\Syksy\\Ticketing-System\\BlazorApp1\\wwwroot\\css\\StyleSheet.css",
+      "SourceId": "BlazorApp1",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Janne\\Documents\\tehtavat2022\\Syksy\\Ticketing-System\\BlazorApp1\\wwwroot\\",
+      "BasePath": "_content/BlazorApp1",
+      "RelativePath": "css/StyleSheet.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\StyleSheet.css"
     },
     {
       "Identity": "C:\\Users\\Janne\\Documents\\tehtavat2022\\Syksy\\Ticketing-System\\BlazorApp1\\wwwroot\\favicon.ico",

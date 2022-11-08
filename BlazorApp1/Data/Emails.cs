@@ -2,42 +2,82 @@
 using Microsoft.JSInterop;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using BlazorApp1.Models;
+using Microsoft.Extensions.Options;
 
 namespace BlazorApp1.Data
 {
 
     public class Emails
     {
-
-          public List<ConversationNode>? getconversion(string messageid)
-        //  public Collection<Item>? getconversion(string messageid)
-        {
+        /*
+        *******************************************************************************
+        Declare own MongoDB settings in appsettings.json
+        It's hided from Github for security reasons
+        *******************************************************************************
          
-            string[] credentials = File.ReadAllText(@".\Cred.txt").Split(new[] { ' ' }); ;
-            string emailaddress = credentials[0];
-            string password = credentials[1];
-            string emailurl = credentials[2];
-            ExchangeService service = new ExchangeService(ExchangeVersion.Exchange2013_SP1);
+         * */
+        // Variable declares for MongoDB database.
+        private readonly IMongoCollection<Datamodel> emailcollection;
+        private MongoClient mongoClient { get; set; }
+        private readonly IMongoDatabase mongoDatabase;
+
+
+        // Variables for setting credentials from txt file.
+        private string[] credentials;
+        private string emailaddress;
+        private string password;
+        private string emailurl;
+
+
+        // Needed for Microsoft EWS.
+        private ExchangeService service;
+
+        public Emails(IOptions<Settingsmodel> settingsmodel)
+        {
+            // Settings model is used as class to read Mongodb
+            // Settings Mongodb values from appsettings.json
+            mongoClient = new MongoClient(
+            settingsmodel.Value.ConnectionString);
+
+            mongoDatabase = mongoClient.GetDatabase(
+                settingsmodel.Value.DatabaseName);
+
+            emailcollection = mongoDatabase.GetCollection<Datamodel>(
+                settingsmodel.Value.EmailCollectionName);
+
+
+
+            // Reading password/username credentials from Cred.txt file. This file is hidden from github.
+            credentials = File.ReadAllText(@".\Cred.txt").Split(new[] { ' ' }); ;
+            emailaddress = credentials[0];
+            password = credentials[1];
+            emailurl = credentials[2];
+
+            // Settings ExchangeService.
+            service = new ExchangeService(ExchangeVersion.Exchange2013_SP1);
             service.Credentials = new WebCredentials(emailaddress, password);
             service.TraceEnabled = true;
             service.TraceFlags = TraceFlags.All;
             service.Url = new Uri(emailurl);
             System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+        }
 
-            //Collection<Item> items = new Collection<Item>();
+
+
+        public List<ConversationNode>? getconversion(string messageid)
+        {   // List declaration for items in conversation.
             List<ConversationNode> items = new List<ConversationNode>();
+            // Try catch block.
             try
             {
-                // Find an item in a conversation. Find the first item.
-                // FindItemsResults<Item> results = service.FindItems(WellKnownFolderName.Inbox, UserId.Equals(messageid), new ItemView(1));
-                /*  FindItems(WellKnownFolderName.Inbox,
-                                                                 new ItemView());*/
+                // Object for reading email.
                 EmailMessage email = EmailMessage.Bind(service, new ItemId(messageid));
                 // Get the conversation identifier of an item. 
                 ConversationId convId = email.ConversationId;
-                //      Console.WriteLine(convId, "Convid tässä");
-                // Specify the properties that will be 
-                // returned for the items in the conversation.
+                // Properties for what to return for each email.
                 PropertySet properties = new PropertySet(BasePropertySet.IdOnly,
                                                           ItemSchema.Subject,
                                                           ItemSchema.DateTimeReceived, ItemSchema.TextBody, ItemSchema.IsFromMe);
@@ -53,21 +93,10 @@ namespace BlazorApp1.Data
                                                                                ConversationSortOrder.TreeOrderDescending);
 
                 // Get the synchronization state of the conversation.
- 
-
                 foreach (ConversationNode node in response.ConversationNodes)
                 {
-                   // Console.WriteLine("Parent conversation index: " + node.Items[0].Subject);
                     items.Add(node);
-                    /*foreach (Item item in node.Items)
-                    {
-                        Console.WriteLine("   Item ID: " + item.Id.UniqueId);
-                        Console.WriteLine("   Subject: " + item.Subject);
-                        Console.WriteLine("   Sender: " + item.IsFromMe);
-                        Console.WriteLine("   Received: " + item.DateTimeReceived);
-                        Console.WriteLine("   Body: " + item.TextBody.Text);
-                        items.Add(item);
-                    }*/
+
                 }
             }
             // This exception may occur if there is an error with the service.
@@ -75,55 +104,82 @@ namespace BlazorApp1.Data
             {
                 Console.WriteLine(srException);
             }
+
+            // Returns conversation items which is later used in site.
             return items;
         }
 
-//*****************************************************************************************
-        public List<EmailMessage>? Getemails()
+
+
+
+        // Function used to get messages from database
+        public List<Datamodel> GetmessagesdbAsync()
         {
-            string[] credentials = File.ReadAllText(@".\Cred.txt").Split(new[] { ' ' }); ;
-            string emailaddress = credentials[0];
-            string password = credentials[1];
-            string emailurl = credentials[2];
-          
-
-
-            ExchangeService service = new ExchangeService(ExchangeVersion.Exchange2013_SP1);
-            service.Credentials = new WebCredentials(emailaddress,password);
-            service.TraceEnabled = true;
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
-            
-            // service.TraceFlags = TraceFlags.All;
-            // service.UseDefaultCredentials = true;
+            List<Datamodel> ListOfEmails = emailcollection.Find(x => x.handler.Equals("")).ToList();
+            return ListOfEmails;
+        }
+        
+        // Function used to get unreaded emails and insert them to database.
+        public void Getemails()
+        {
+            // Variable declaration.
             FindItemsResults<Item> findResults;
+            // offset
             int offset = 0;
+            // How many to get at function call (loads this many messages at one time).
             int pageSize = 20;
+            // Creates view and uses variables above
             ItemView view = new ItemView(pageSize, offset, OffsetBasePoint.Beginning);
+            
+            // Assings email service url.
             service.Url = new Uri(emailurl);
+            // finds results from email folder (this is set to Inbox).
             findResults = service.FindItems(WellKnownFolderName.Inbox, view);
-            List<EmailMessage> Unreaded = new List<EmailMessage>();
-
-
-
+            // Lists emails to list.
+            List<Datamodel> Useremailmodel = new List<Datamodel>();
+            // Session variable for mongoclient.
+            var session = mongoClient.StartSession();
+            // Bool value to prevent error if there arent't emails then no need to update.
+           
+            // Foreach loop to read messages.
             foreach (EmailMessage message in findResults.Items)
             {
+                // If message is unreaded
                 if (message.IsRead == false) //if the current message is unread
-                {       
-                    Unreaded.Add(message);  
+                {
+                    // Add Datamodel to list (model object for database)
+                    Useremailmodel.Add(new Datamodel { subject = message.Subject.ToString(), sender = message.Sender.ToString(), attachment = message.Attachments.Count().ToString(), message_id = message.Id.ToString(), datetimecreated = message.DateTimeCreated.ToString(), datetimereceived = message.DateTimeReceived.ToString(), handler = "", status = "New" });
+                    // Sets email readed.
+                    message.IsRead = true;
+                    // Updates email "state".
+                    message.Update(ConflictResolutionMode.AutoResolve);
                 }
                 else
                 {
+                    // If email is readed but it's useless at moment.
                 }
-             
+
             }
-            return Unreaded;
-     
+            bool isEmail = Useremailmodel.Any();
+
+            // If list has new unreaded emails, then insert them to mongodb database.
+            if (isEmail == true)
+            {
+                emailcollection.InsertMany(session, Useremailmodel);
+
+
+            }
         }
+
+
+        // Uselessa at the moment.
         static bool RedirectionCallback(string url)
         {
             // Return true if the URL is an HTTPS URL.
             return url.ToLower().StartsWith("https://");
         }
+
+        // Useless at the moment.
         private static bool RedirectionUrlValidationCallback(string redirectionUrl)
         {
             // The default for the validation callback is to reject the URL.
