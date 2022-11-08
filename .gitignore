@@ -1,3 +1,5 @@
 /BlazorApp1/cred.txt
 /.vs*
 /BlazorApp1/appsettings.json
+# Config files
+appsettings.Development.json
