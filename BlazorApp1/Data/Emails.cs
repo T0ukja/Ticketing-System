@@ -6,6 +6,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using BlazorApp1.Models;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace BlazorApp1.Data
 {
@@ -20,23 +21,26 @@ namespace BlazorApp1.Data
          
          * */
         // Variable declares for MongoDB database.
-        private readonly IMongoCollection<Datamodel> emailcollection;
+        private readonly IMongoCollection<Datamodel> emailCollection;
+
         private MongoClient mongoClient { get; set; }
         private readonly IMongoDatabase mongoDatabase;
 
 
         // Variables for setting credentials from txt file.
         private string[] credentials;
-        private string emailaddress;
+        private string emailAddress;
         private string password;
         private string emailurl;
-
+        public IMemoryCache MemoryCache { get; }
 
         // Needed for Microsoft EWS.
         private ExchangeService service;
 
-        public Emails(IOptions<Settingsmodel> settingsmodel)
+
+        public Emails(IOptions<Settingsmodel> settingsmodel, IMemoryCache memoryCache)
         {
+            MemoryCache = memoryCache;
             // Settings model is used as class to read Mongodb
             // Settings Mongodb values from appsettings.json
             mongoClient = new MongoClient(
@@ -45,20 +49,20 @@ namespace BlazorApp1.Data
             mongoDatabase = mongoClient.GetDatabase(
                 settingsmodel.Value.DatabaseName);
 
-            emailcollection = mongoDatabase.GetCollection<Datamodel>(
+            emailCollection = mongoDatabase.GetCollection<Datamodel>(
                 settingsmodel.Value.EmailCollectionName);
 
-
+            // Emailmessage for sending messages
 
             // Reading password/username credentials from Cred.txt file. This file is hidden from github.
             credentials = File.ReadAllText(@".\Cred.txt").Split(new[] { ' ' }); ;
-            emailaddress = credentials[0];
+            emailAddress = credentials[0];
             password = credentials[1];
             emailurl = credentials[2];
 
             // Settings ExchangeService.
             service = new ExchangeService(ExchangeVersion.Exchange2013_SP1);
-            service.Credentials = new WebCredentials(emailaddress, password);
+            service.Credentials = new WebCredentials(emailAddress, password);
             service.TraceEnabled = true;
             service.TraceFlags = TraceFlags.All;
             service.Url = new Uri(emailurl);
@@ -67,14 +71,19 @@ namespace BlazorApp1.Data
 
 
 
-        public List<ConversationNode>? getconversion(string messageid)
+        public async Task<List<ConversationNode>>? GetConversion(string messageId)
         {   // List declaration for items in conversation.
+            var sw = new Stopwatch();
+            sw.Start();
             List<ConversationNode> items = new List<ConversationNode>();
             // Try catch block.
             try
             {
+
+
+           
                 // Object for reading email.
-                EmailMessage email = EmailMessage.Bind(service, new ItemId(messageid));
+                EmailMessage email = EmailMessage.Bind(service, new ItemId(messageId));
                 // Get the conversation identifier of an item. 
                 ConversationId convId = email.ConversationId;
                 // Properties for what to return for each email.
@@ -86,18 +95,17 @@ namespace BlazorApp1.Data
                 Collection<FolderId> foldersToIgnore = new Collection<FolderId>() { WellKnownFolderName.DeletedItems, WellKnownFolderName.Drafts };
 
                 // Request conversation items. This results in a call to the service.         
-                ConversationResponse response = service.GetConversationItems(convId,
-                                                                               properties,
-                                                                               null,
-                                                                               foldersToIgnore,
-                                                                               ConversationSortOrder.TreeOrderDescending);
-
-                // Get the synchronization state of the conversation.
-                foreach (ConversationNode node in response.ConversationNodes)
+                ConversationResponse response = service.GetConversationItems(convId,properties,null,foldersToIgnore,ConversationSortOrder.TreeOrderDescending);
+                 
+                await System.Threading.Tasks.Task.Run(() =>
                 {
-                    items.Add(node);
+                    // Get the synchronization state of the conversation.
+                    Parallel.ForEach(response.ConversationNodes, node =>
+                    {
+                        items.Add(node);
 
-                }
+                    });
+                });
             }
             // This exception may occur if there is an error with the service.
             catch (ServiceResponseException srException)
@@ -113,30 +121,38 @@ namespace BlazorApp1.Data
 
 
         // Function used to get messages from database
-        public List<Datamodel> GetmessagesdbAsync()
+        public async Task<List<Datamodel>> GetMessagesDbAsync()
         {
-            List<Datamodel> ListOfEmails = emailcollection.Find(x => x.handler.Equals("")).ToList();
-            return ListOfEmails;
+           
+             List<Datamodel> listOfEmails = emailCollection.Find(x => x.handler.Equals("")).ToList();
+            return listOfEmails;
+
         }
-        
-        // Function used to get unreaded emails and insert them to database.
-        public void Getemails()
+
+
+
+    // Function used to get unreaded emails and insert them to database.
+    public void GetEmails()
         {
+            EmailMessage helpdeskemail = new EmailMessage(service);
+
+
             // Variable declaration.
             FindItemsResults<Item> findResults;
-            // offset
-            int offset = 0;
+            // offSet
+            int offSet = 0;
             // How many to get at function call (loads this many messages at one time).
             int pageSize = 20;
             // Creates view and uses variables above
-            ItemView view = new ItemView(pageSize, offset, OffsetBasePoint.Beginning);
+            ItemView view = new ItemView(pageSize, offSet, OffsetBasePoint.Beginning);
             
             // Assings email service url.
             service.Url = new Uri(emailurl);
             // finds results from email folder (this is set to Inbox).
             findResults = service.FindItems(WellKnownFolderName.Inbox, view);
             // Lists emails to list.
-            List<Datamodel> Useremailmodel = new List<Datamodel>();
+            //   List<Datamodel> emailModel = new List<Datamodel>();
+            Datamodel emailModel = new Datamodel();
             // Session variable for mongoclient.
             var session = mongoClient.StartSession();
             // Bool value to prevent error if there arent't emails then no need to update.
@@ -145,30 +161,47 @@ namespace BlazorApp1.Data
             foreach (EmailMessage message in findResults.Items)
             {
                 // If message is unreaded
-                if (message.IsRead == false) //if the current message is unread
+                if ((message.IsRead == false) && (message.InReplyTo == null)) //if the current message is unread
                 {
-                    // Add Datamodel to list (model object for database)
-                    Useremailmodel.Add(new Datamodel { subject = message.Subject.ToString(), sender = message.Sender.ToString(), attachment = message.Attachments.Count().ToString(), message_id = message.Id.ToString(), datetimecreated = message.DateTimeCreated.ToString(), datetimereceived = message.DateTimeReceived.ToString(), handler = "", status = "New" });
+                  // Adds data to emailModel and then push's it to database.
+                   emailModel.subject = message.Subject;
+                   emailModel.sender = message.Sender.ToString();
+                   emailModel.attachment = message.Attachments.Count().ToString();
+                   emailModel.message_id = message.Id.ToString();
+                   emailModel.datetimecreated = message.DateTimeCreated.ToString();
+                   emailModel.datetimereceived = message.DateTimeReceived.ToString();
+                   emailModel.handler = "";
+                   emailModel.status = "New";
                     // Sets email readed.
                     message.IsRead = true;
-                    // Updates email "state".
+          
+                    //Updates email state
                     message.Update(ConflictResolutionMode.AutoResolve);
+
+
+                    //Inserts email to database collection
+                    emailCollection.InsertOneAsync(emailModel);
+                    // Reply message string
+                    string replyMessage = "Tämä on järjestelmäpalvelun automaattinen viesti. Olemme vastaanottaneet tukipyyntösi ja se tullaan käsittelemään mahdollisimman pian." +
+                        "Jos haluat lähettää lisätietoja tukipyyntöösi liittyen, vastaa tähän sähköpostiin.\n" +
+                        "Tksystem palvelu";
+                    // This true
+                    bool replyToAll = true;
+                    // Load email because an error occured.
+                    message.Load();
+                    // The actual sending command with parameters.
+                    message.Reply(replyMessage, replyToAll);
+                  
+
                 }
                 else
                 {
                     // If email is readed but it's useless at moment.
                 }
-
             }
-            bool isEmail = Useremailmodel.Any();
-
-            // If list has new unreaded emails, then insert them to mongodb database.
-            if (isEmail == true)
-            {
-                emailcollection.InsertMany(session, Useremailmodel);
 
 
-            }
+            
         }
 
 
