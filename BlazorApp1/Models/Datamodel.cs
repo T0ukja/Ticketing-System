@@ -8,8 +8,7 @@ namespace BlazorApp1.Models
     {
 
 
-        //  [BsonId]
-        //[BsonRepresentation(BsonType.ObjectId)]
+    // Model for mongodb document "object"
     public ObjectId id { get; set; }
     public string? subject { get; set; }
     public string sender { get; set; }

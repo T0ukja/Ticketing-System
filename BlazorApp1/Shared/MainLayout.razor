@@ -1,4 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager navManager;
+@using BlazorApp1.Authentication
 
 <PageTitle>BlazorApp1</PageTitle>
 
@@ -8,12 +11,38 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+        <div class="top-row px-1" style="justify-content: left;">
+        <AuthorizeView>
+                                
+        <Authorized>
 
+                 <h3 align="left" style="text-align:right">Hello @context.User.Identity.Name</h3>
+                
+
+           
+             <a @onclick="LogOut" href="javascript::void(0)">Logout</a>
+
+
+        </Authorized>
+        
+
+        </AuthorizeView>
+     
+
+          </div>
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+@code{
+    	[CascadingParameter]
+	private Task<AuthenticationState> authstat { get; set; 
+	}
+        private async Task LogOut(){
+         var customAuthenticationProvider = (CustomAuthenticationProvider)authStateProvider;
+            await customAuthenticationProvider.UpdateAuthenticationState(null);
+            navManager.NavigateTo("/login", true);
+    }
+}

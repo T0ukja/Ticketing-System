@@ -6,3 +6,19 @@ ul[b-3xxtam6d07] {
     font-size: 20px;
  
 }
+
+#GridID .k-grid-content {
+    overflow-y: hidden;
+}
+
+.k-grid-header {
+    padding: 0px !important;
+}
+
+#GridID .k-grid-header {
+    padding: 0 !important;
+}
+
+#GridID .k-grid-content {
+    overflow-y: visible;
+}

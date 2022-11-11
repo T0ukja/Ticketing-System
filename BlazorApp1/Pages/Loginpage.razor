@@ -1,0 +1,61 @@
+﻿@page "/login"
+@using System.Collections.ObjectModel;
+@using BlazorApp1.Pages
+@using BlazorApp1.Models
+@using BlazorApp1.Data
+@using BlazorApp1.Authentication
+@inject Login Logging
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager navManager;
+@inject IJSRuntime JSRuntime
+
+
+
+<h3>Login site</h3>
+
+  <div class="col-6"> 
+    <p>
+    <input @bind="logusername" />
+</p>
+<p>
+    <input @bind="logPassword" />
+</p>
+<button type="button" class="close" @onclick="()=> CheckLogin(logusername,logPassword)">
+    Login
+</button>
+
+</div>
+
+
+@code {
+
+    // Variables for handling login data.
+    private string? logusername { get; set; }
+    private string? logPassword { get; set; }
+
+
+
+
+    private async Task CheckLogin(string username, string password) {
+        LoginModel userAccount = Logging.CheckUserLogin(username, password);
+
+
+
+        if (userAccount != null)
+        {
+            var customAuthenticationProvider = (CustomAuthenticationProvider)authStateProvider;
+            await customAuthenticationProvider.UpdateAuthenticationState(new UserSession
+                {
+                    UserName = userAccount.username,
+                    Role = userAccount.Role
+        });
+            navManager.NavigateTo("/", true);
+        }
+    else
+    {
+        await JSRuntime.InvokeVoidAsync("alert", "Invalid Credentials!");
+    }
+
+     
+    }
+}

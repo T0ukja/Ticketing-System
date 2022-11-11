@@ -1,12 +1,21 @@
 ﻿@page "/tickets"
 @using System.Collections.ObjectModel;
-
 @using BlazorApp1.Data
 @using System.Timers;
 @using BlazorApp1.Models;
 @inject Emails Emailing
+@inject NavigationManager navManager;
 @inject IJSRuntime JSRuntime
+@attribute [Authorize(Roles = "Administrator, HelpDesk")]
+
+
+
+
+
 <PageTitle>TkSystem</PageTitle>
+
+
+
 <style>
 
 </style>
@@ -15,6 +24,8 @@
 <h1>Uudet tiketit</h1>
 
 <h1>@mongoDbList.Count()</h1>
+	   		
+
 @foreach (Datamodel message in mongoDbList)
 {
 	<ul>
@@ -54,44 +65,54 @@
 
 
 		}
+
+		
 	</ul>
 
 
 
-
-    @code {
-    // Timer variable declaration.
-    private static System.Timers.Timer aTimer;
-    // This is variable is used to get id of conversation which is later compared to dialog email id.
-    private string emailId;
-    // List which is used to get objects from MongoDB database collection.
-    private List<Datamodel> mongoDbList;
-    // Used to loop email conversation messages.
-    private List<Microsoft.Exchange.WebServices.Data.ConversationNode> emailChain;
-    // Timer which is assigned 15 seconds (Updates every 5 seconds).
-    PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(10));
-    // bool variable for dialog state.
-    bool ShowPopUp = false;
-
-
-    // This function is called when pressing more information about ticket.
-    private async Task CheckData(string id)
-    {
-        // Getting conversation of email to list.
-        emailChain = await Emailing.GetConversion(id);
-        // Assigning id, which is compared later in dialog.
-        emailId = id;
-        // This opens dialog when true.
-        ShowPopUp = true;
-
-    }
+	@code {
+	
+	[CascadingParameter]
+	private Task<AuthenticationState> authstat { get; set; 
+	}
 
 
 
 
-    protected override async Task OnInitializedAsync()
+	// Timer variable declaration.
+	private static System.Timers.Timer aTimer;
+	// This is variable is used to get id of conversation which is later compared to dialog email id.
+	private string emailId;
+	// List which is used to get objects from MongoDB database collection.
+	private List<Datamodel> mongoDbList;
+	// Used to loop email conversation messages.
+	private List<Microsoft.Exchange.WebServices.Data.ConversationNode> emailChain;
+	// Timer which is assigned 15 seconds (Updates every 5 seconds).
+	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(10));
+	// bool variable for dialog state.
+	bool ShowPopUp = false;
+
+
+	// This function is called when pressing more information about ticket.
+	private async Task CheckData(string id)
 	{
-		
+		// Getting conversation of email to list.
+		emailChain = await Emailing.GetConversion(id);
+		// Assigning id, which is compared later in dialog.
+		emailId = id;
+		// This opens dialog when true.
+		ShowPopUp = true;
+
+	}
+
+
+
+
+	protected override async Task OnInitializedAsync()
+	{
+	
+
     // Assing messages to list (Checks if there is new unreaded messages available and send them to database).
     mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
 	RunTimer();
@@ -110,6 +131,7 @@
 		// Timer function.
 		while (await periodicTimer.WaitForNextTickAsync())
 		{
+			// Do check to verify that there is new email
 			// Get new emails and updates list.
 			Emailing.GetEmails();
 			mongoDbList = await Emailing.GetMessagesDbAsync();

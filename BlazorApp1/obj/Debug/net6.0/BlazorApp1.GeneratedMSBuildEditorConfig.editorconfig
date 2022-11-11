@@ -23,6 +23,18 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Janne/Documents/tehtavat2022/Syksy/Ticketing-System/BlazorApp1/Pages/Loginpage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW5wYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Janne/Documents/tehtavat2022/Syksy/Ticketing-System/BlazorApp1/Pages/Redirect.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVkaXJlY3QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Janne/Documents/tehtavat2022/Syksy/Ticketing-System/BlazorApp1/Pages/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Janne/Documents/tehtavat2022/Syksy/Ticketing-System/BlazorApp1/Pages/Tickets.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGlja2V0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 

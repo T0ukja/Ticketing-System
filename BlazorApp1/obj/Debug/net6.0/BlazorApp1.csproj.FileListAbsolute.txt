@@ -69,3 +69,5 @@ C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debu
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\runtimes\linux\native\libmongocrypt.so
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\runtimes\osx\native\libmongocrypt.dylib
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\runtimes\win\native\mongocrypt.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\BCrypt.Net-Next.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Blazored.SessionStorage.dll

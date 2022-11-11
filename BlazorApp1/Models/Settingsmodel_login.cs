@@ -1,7 +1,7 @@
 ﻿namespace BlazorApp1.Models
 {
     // Class to read configurations for MongoDB
-    public class Settingsmodel
+    public class Settingsmodel_login
     {
         public string ConnectionString { get; set; } = null!;
 

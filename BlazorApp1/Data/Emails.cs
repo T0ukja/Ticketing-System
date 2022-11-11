@@ -50,7 +50,7 @@ namespace BlazorApp1.Data
                 settingsmodel.Value.DatabaseName);
 
             emailCollection = mongoDatabase.GetCollection<Datamodel>(
-                settingsmodel.Value.EmailCollectionName);
+                settingsmodel.Value.CollectionName);
 
             // Emailmessage for sending messages
 

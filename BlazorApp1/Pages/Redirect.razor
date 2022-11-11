@@ -1,0 +1,21 @@
+﻿@page "/redirect"
+<h3>Redirect to Login.....</h3>
+@inject NavigationManager navmanag
+@code{
+	// Redirect function if user is not logged in, redirects to loginpage. Check App.Razor to see how it's implemented.
+
+[CascadingParameter]
+private Task<AuthenticationState> AuthenticationStateTask{ get; set; }
+	protected override async Task OnInitializedAsync()
+	{
+
+					navmanag.NavigateTo("/login", true);
+
+		
+
+
+	}
+
+
+}
+

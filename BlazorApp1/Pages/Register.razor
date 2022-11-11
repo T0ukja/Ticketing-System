@@ -1,0 +1,27 @@
+﻿@page "/register"
+
+@using BlazorApp1.Data
+@attribute [Authorize(Roles = "Administrator")]
+
+@inject Login login
+<h3>Register</h3>
+<div>
+    <p>
+    <input @bind="registeru" />
+</p>
+<p>
+    <input @bind="registerp" />
+</p>
+<button type="button" class="close" @onclick="()=> CreateUser(registeru,registerp)">
+    Login
+</button>
+
+</div>
+@code {
+	    private async Task CreateUser(string registeru, string registerp) {
+       await login.CreateNewUser(registeru, registerp, "Administrator");
+
+    }
+	    private string? registeru { get; set; }
+    private string? registerp { get; set; }
+}
