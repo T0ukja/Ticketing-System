@@ -78,10 +78,23 @@
 								@foreach(Item item in node.Items)
 								{
 							
-								<div id="divTest" style="border:1px solid black;">
-									<tr>
-										@item.TextBody.ToString();
+							var index =@item.TextBody.Text.ToString().IndexOf("_");
+									<div id="divTest" style="border:1px solid black;">
+										<tr>
+											@if (index > 1)
+											{
+											@item.TextBody.Text.Remove(index).ToString();
+
+											}
+											else
+											{
+										@item.TextBody.Text.ToString();
+
+												
+
+											}
 								
+
 									</tr>
 
 									<button type="button" class="close" @onclick="() => SendMail()">Answer</button>
