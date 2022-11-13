@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using BlazorApp1.Authentication;
+using BlazorStrap;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,6 +19,7 @@ builder.Services.Configure<Settingsmodel>(
     builder.Configuration.GetSection("EmailDatabase"));
 builder.Services.Configure<Settingsmodel_login>(
     builder.Configuration.GetSection("LoginDatabase"));
+
 
 
 

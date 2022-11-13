@@ -44,6 +44,10 @@
               "target": "Package",
               "version": "[4.0.3, )"
             },
+            "BlazorStrap": {
+              "target": "Package",
+              "version": "[5.0.106, )"
+            },
             "Blazored.SessionStorage": {
               "target": "Package",
               "version": "[2.2.0, )"

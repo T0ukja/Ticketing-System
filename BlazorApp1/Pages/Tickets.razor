@@ -2,6 +2,8 @@
 @using System.Collections.ObjectModel;
 @using BlazorApp1.Data
 @using System.Timers;
+@using Microsoft.Exchange.WebServices.Data;
+
 @using BlazorApp1.Models;
 @inject Emails Emailing
 @inject NavigationManager navManager;
@@ -25,58 +27,90 @@
 
 <h1>@mongoDbList.Count()</h1>
 	   		
+<table>
+	 <tr>
+    <th>Subject</th>
+    <th>From</th>
+    <th>Time</th>
+  </tr>
+  
 
 @foreach (Datamodel message in mongoDbList)
 {
-	<ul>
-		<li>
+		<tr>
+		<th>
 			@message.subject
-		</li>
-
-
-
+		</th>
+			<th>
+			@message.sender
+		</th>
+				<th>
+			@message.datetimereceived
+		</th>
+	
 
 		<button class="btn btn-primary" @onclick="() => CheckData(message.message_id.ToString())">Katso tiedot</button>
+
+		</tr>
+
+
 		@if (emailChain != null && message.message_id.ToString().Equals(emailId) && ShowPopUp)
 		{
-			<div class="modal" tabindex="-1" style="display:block" role="dialog">
-				<div class="modal-dialog">
+			<div class="modal" tabindex="-1" dialogbox role="dialog">
+				<div class="modal-dialog modal-lg">
 					<div class="modal-content">
-						<div class="modal-header">
+						<div class="modal-header" style="align-self:center;" >
+						
+
+							
+
 							<h1>
 								@message.subject
 							</h1>
-							<button type="button" class="close" @onclick="()=> ClosePopup()"> Close</button>
+						
+							
 						</div>
 						<div class="modal-body" id="listitems">
-                            @foreach (Microsoft.Exchange.WebServices.Data.Item item in emailChain[0].Items)
-                            {
-								<ul b-3xxtam6d07>
+							
+									
+                            @foreach(ConversationNode node in emailChain.ConversationNodes){
+							
+								@foreach(Item item in node.Items)
+								{
+							
+								<div id="divTest" style="border:1px solid black;">
+									<tr>
+										@item.TextBody.ToString();
+								
+									</tr>
 
-									@item.TextBody.Text
-								</ul>
+									<button type="button" class="close" @onclick="() => SendMail()">Answer</button>
+									<button type="button" class="close" @onclick="() => ResponseMail()">Response</button>
 
 
-							}
 						</div>
+
+
+							
+								}
+							}
+						
+						</div>
+											<button type="button" class="close" @onclick="()=> ClosePopup()"> Close</button>
+
 					</div>
 				</div>
 			</div>
-
+		
 
 		}
+		}
+</table>
+@code {
 
-		
-	</ul>
-
-
-
-	@code {
-	
 	[CascadingParameter]
 	private Task<AuthenticationState> authstat { get; set; 
 	}
-
 
 
 
@@ -87,15 +121,15 @@
 	// List which is used to get objects from MongoDB database collection.
 	private List<Datamodel> mongoDbList;
 	// Used to loop email conversation messages.
-	private List<Microsoft.Exchange.WebServices.Data.ConversationNode> emailChain;
 	// Timer which is assigned 15 seconds (Updates every 5 seconds).
 	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(10));
 	// bool variable for dialog state.
 	bool ShowPopUp = false;
 
+	ConversationResponse emailChain;
 
 	// This function is called when pressing more information about ticket.
-	private async Task CheckData(string id)
+	private async System.Threading.Tasks.Task CheckData(string id)
 	{
 		// Getting conversation of email to list.
 		emailChain = await Emailing.GetConversion(id);
@@ -109,16 +143,24 @@
 
 
 
-	protected override async Task OnInitializedAsync()
+	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
-	
 
-    // Assing messages to list (Checks if there is new unreaded messages available and send them to database).
-    mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
-	RunTimer();
+
+		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
+		mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
+		RunTimer();
 	}
 
-    void ClosePopup()
+	void ResponseMail()
+	{
+
+	}
+	void SendMail()
+	{
+		
+	}
+	void ClosePopup()
     {
 		// Changes value to false to shutdown dialog module
 		ShowPopUp = false;

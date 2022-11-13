@@ -71,3 +71,13 @@ C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debu
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\runtimes\win\native\mongocrypt.dll
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\BCrypt.Net-Next.dll
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Blazored.SessionStorage.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\BlazorComponentUtilities.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\BlazorStrap.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Microsoft.AspNetCore.Authorization.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Microsoft.AspNetCore.Components.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Microsoft.AspNetCore.Components.Forms.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Microsoft.AspNetCore.Components.Web.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Microsoft.AspNetCore.Metadata.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Microsoft.JSInterop.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\System.IO.Pipelines.dll

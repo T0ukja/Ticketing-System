@@ -1,18 +1,31 @@
 ﻿@inherits LayoutComponentBase
 @inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager navManager;
+@using BlazorApp1.Pages
 @using BlazorApp1.Authentication
 
 <PageTitle>BlazorApp1</PageTitle>
+<AuthorizeView>
+    <NotAuthorized>
+        <div class="page">
+            <main>
+           <Loginpage/>
+        </main>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
 
-<div class="page">
-    <div class="sidebar">
+
+
+ 
+    <AuthorizeView>
+        <div class="page">
+   <div class="sidebar">
         <NavMenu />
     </div>
-
     <main>
         <div class="top-row px-1" style="justify-content: left;">
-        <AuthorizeView>
+        
                                 
         <Authorized>
 
@@ -26,7 +39,7 @@
         </Authorized>
         
 
-        </AuthorizeView>
+   
      
 
           </div>
@@ -34,7 +47,10 @@
             @Body
         </article>
     </main>
-</div>
+    </div>
+        </AuthorizeView>
+
+
 
 @code{
     	[CascadingParameter]

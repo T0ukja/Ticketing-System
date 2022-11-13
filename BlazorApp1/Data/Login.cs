@@ -13,12 +13,12 @@ namespace BlazorApp1.Data
         // Variable declares for MongoDB database.
         private readonly IMongoCollection<LoginModel> userNameCollection;
         // Uncomment if wanna log data.
-        //private readonly ILogger _logger;
+        private readonly ILogger _logger;
         private MongoClient mongoClient { get; set; }
         private readonly IMongoDatabase mongoDatabase;
-        public Login(IOptions<Settingsmodel_login> settingsmodel /*, ILogger<Login> logger*/)
+        public Login(IOptions<Settingsmodel_login> settingsmodel  ,ILogger<Login> logger)
         {
-            //_logger = logger;
+            _logger = logger;
    
             // Settings model is used as class to read Mongodb
             // Settings Mongodb values from appsettings.json
@@ -42,7 +42,6 @@ namespace BlazorApp1.Data
             {
                 // Gets data from database.
                 var DBuserLoginData = userNameCollection.Find(m => m.username == username).FirstOrDefault();
-              
                 // Check if database hashed/salted password match
                 bool doesPasswordMatch = BC.Verify(password, DBuserLoginData.password);
                 if (doesPasswordMatch == true)
@@ -51,6 +50,7 @@ namespace BlazorApp1.Data
                     LoginModel loggedaccount = new LoginModel();
                     loggedaccount.username = DBuserLoginData.username;
                     loggedaccount.Role = DBuserLoginData.Role;
+                    _logger.LogInformation("moro");
 
                     return loggedaccount;
                   

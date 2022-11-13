@@ -71,51 +71,62 @@ namespace BlazorApp1.Data
 
 
 
-        public async Task<List<ConversationNode>>? GetConversion(string messageId)
-        {   // List declaration for items in conversation.
+        public async Task<ConversationResponse> GetConversion(string messageId)
+        {
+            // List declaration for items in conversation.
             var sw = new Stopwatch();
             sw.Start();
-            List<ConversationNode> items = new List<ConversationNode>();
-            // Try catch block.
-            try
-            {
+            ConversationResponse response;
 
 
-           
-                // Object for reading email.
-                EmailMessage email = EmailMessage.Bind(service, new ItemId(messageId));
-                // Get the conversation identifier of an item. 
-                ConversationId convId = email.ConversationId;
-                // Properties for what to return for each email.
-                PropertySet properties = new PropertySet(BasePropertySet.IdOnly,
-                                                          ItemSchema.Subject,
-                                                          ItemSchema.DateTimeReceived, ItemSchema.TextBody, ItemSchema.IsFromMe);
+       List<ConversationNode> items = new List<ConversationNode>();
+           // Try catch block.
+           try
+           {
 
-                // Identify the folders to ignore.
-                Collection<FolderId> foldersToIgnore = new Collection<FolderId>() { WellKnownFolderName.DeletedItems, WellKnownFolderName.Drafts };
 
-                // Request conversation items. This results in a call to the service.         
-                ConversationResponse response = service.GetConversationItems(convId,properties,null,foldersToIgnore,ConversationSortOrder.TreeOrderDescending);
-                 
-                await System.Threading.Tasks.Task.Run(() =>
-                {
-                    // Get the synchronization state of the conversation.
-                    Parallel.ForEach(response.ConversationNodes, node =>
-                    {
-                        items.Add(node);
 
-                    });
-                });
-            }
-            // This exception may occur if there is an error with the service.
-            catch (ServiceResponseException srException)
-            {
-                Console.WriteLine(srException);
-            }
+               // Object for reading email.
+               EmailMessage email = EmailMessage.Bind(service, new ItemId(messageId));
+       // Get the conversation identifier of an item. 
+       ConversationId convId = email.ConversationId;
+       // Properties for what to return for each email.
+       PropertySet properties = new PropertySet(BasePropertySet.IdOnly,
+                                                 ItemSchema.Subject,
+                                                 ItemSchema.DateTimeReceived, ItemSchema.TextBody, ItemSchema.IsFromMe);
 
-            // Returns conversation items which is later used in site.
-            return items;
+       // Identify the folders to ignore.
+       Collection<FolderId> foldersToIgnore = new Collection<FolderId>() { WellKnownFolderName.DeletedItems, WellKnownFolderName.Drafts };
+
+       // Request conversation items. This results in a call to the service.         
+       response = service.GetConversationItems(convId, properties, null, foldersToIgnore, ConversationSortOrder.TreeOrderDescending);
+
+      /* await System.Threading.Tasks.Task.Run(() =>
+               {
+           // Get the synchronization state of the conversation.
+           Parallel.ForEach(response.ConversationNodes, node =>
+           {
+               items.Add(node);
+
+           });
+       });
+
+                */
+           }
+           // This exception may occur if there is an error with the service.
+           catch (ServiceResponseException srException)
+           {
+               Console.WriteLine(srException);
+                response = null;
+           }
+
+    // Returns conversation items which is later used in site.
+    return response;
+
+   
         }
+
+
 
 
 
@@ -165,7 +176,7 @@ namespace BlazorApp1.Data
                 {
                   // Adds data to emailModel and then push's it to database.
                    emailModel.subject = message.Subject;
-                   emailModel.sender = message.Sender.ToString();
+                   emailModel.sender = message.Sender.Address.ToString();
                    emailModel.attachment = message.Attachments.Count().ToString();
                    emailModel.message_id = message.Id.ToString();
                    emailModel.datetimecreated = message.DateTimeCreated.ToString();
@@ -177,22 +188,37 @@ namespace BlazorApp1.Data
           
                     //Updates email state
                     message.Update(ConflictResolutionMode.AutoResolve);
+                    try {
+                        //Inserts email to database collection
+                        emailCollection.InsertOneAsync(emailModel);
+                        // Reply message string
 
 
-                    //Inserts email to database collection
-                    emailCollection.InsertOneAsync(emailModel);
-                    // Reply message string
-                    string replyMessage = "Tämä on järjestelmäpalvelun automaattinen viesti. Olemme vastaanottaneet tukipyyntösi ja se tullaan käsittelemään mahdollisimman pian." +
-                        "Jos haluat lähettää lisätietoja tukipyyntöösi liittyen, vastaa tähän sähköpostiin.\n" +
-                        "Tksystem palvelu";
-                    // This true
-                    bool replyToAll = true;
-                    // Load email because an error occured.
-                    message.Load();
-                    // The actual sending command with parameters.
-                    message.Reply(replyMessage, replyToAll);
-                  
 
+                        string replyMessage = "Tämä on järjestelmäpalvelun automaattinen viesti. Olemme vastaanottaneet tukipyyntösi ja se tullaan käsittelemään mahdollisimman pian." +
+                            "Jos haluat lähettää lisätietoja tukipyyntöösi liittyen, vastaa tähän sähköpostiin.\n" +
+                            "Tksystem palvelu";
+                        // This true
+                        bool replyToAll = true;
+
+                        // While loop to check when message is readed, then sends reply mail.
+                     while (message.IsRead == false)
+                        {
+                            message.Load();
+                        }
+                      message.Reply(replyMessage, replyToAll);
+                        
+
+                        // The actual sending command with parameters.
+                       
+                    }
+                    catch (InvalidCastException e)
+                    {
+                        Console.WriteLine(e);
+                    }
+
+            
+                
                 }
                 else
                 {

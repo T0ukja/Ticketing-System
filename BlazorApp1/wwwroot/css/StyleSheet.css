@@ -7,6 +7,40 @@ ul[b-3xxtam6d07] {
  
 }
 
+div[dialogbox] {
+    display: block;
+    width: 100vw;
+    height: 70vh;
+}
+.logb {
+    align-self: center;
+    vertical-align: central;
+    background-color: #1C7CFF; /* Green */
+    border: none;
+    color: white;
+    padding: 16px 40px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 0;
+    position: absolute;
+    top: 64%;
+    left: 42%;
+}
+div[logindiv] {
+    width: 500px;
+    height: 250px;
+    margin: 50px;
+    outline: solid 1px black;
+}
+div[container] {
+    width:100vw;
+    height:70vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
 #GridID .k-grid-content {
     overflow-y: hidden;
 }

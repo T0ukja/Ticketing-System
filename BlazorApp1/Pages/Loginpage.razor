@@ -9,30 +9,63 @@
 @inject NavigationManager navManager;
 @inject IJSRuntime JSRuntime
 
+<link href="/css/StyleSheet.css" rel="stylesheet" />
 
+  <style>
 
-<h3>Login site</h3>
+  </style>
 
-  <div class="col-6"> 
-    <p>
+  <AuthorizeView>
+      <NotAuthorized>
+          <div class="col-6" container>
+    
+       <div main>
+              <h3 style="text-align:center; font-size:40px;">Login</h3>
+            <p>
     <input @bind="logusername" />
 </p>
 <p>
-    <input @bind="logPassword" />
+    <input type="@TxtType" @bind="logPassword" />
+
 </p>
-<button type="button" class="close" @onclick="()=> CheckLogin(logusername,logPassword)">
+<p>
+        <input type="checkbox" @onclick="()=>myFunction()"> Show Password
+
+</p>
+
+<button type="button" class="logb" @onclick="()=> CheckLogin(logusername,logPassword)">
     Login
 </button>
+  
+       </div>
+
 
 </div>
+      </NotAuthorized>
+  </AuthorizeView>
+  
+
+
+
 
 
 @code {
+        public string TxtType = "password"; 
+    private async Task myFunction()
+    {
+        if(TxtType == "password")
+        {
+            TxtType = "text";
+
+        }
+        else{
+            TxtType = "password";
+        }
+    }
 
     // Variables for handling login data.
     private string? logusername { get; set; }
     private string? logPassword { get; set; }
-
 
 
 
