@@ -28,6 +28,7 @@ namespace BlazorApp1.Authentication
                 new Claim(ClaimTypes.Name, userSession.UserName),
             new Claim(ClaimTypes.Role, userSession.Role)
             }, "CustomAuth"));
+                
                 return await Task.FromResult(new AuthenticationState(claimsPrincipal));
             }
             catch

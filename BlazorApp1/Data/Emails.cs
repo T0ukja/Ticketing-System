@@ -7,7 +7,8 @@ using MongoDB.Driver;
 using BlazorApp1.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Memory;
-
+using Microsoft.AspNetCore.Components.Authorization;
+using BlazorApp1.Authentication;
 namespace BlazorApp1.Data
 {
 
@@ -129,18 +130,29 @@ namespace BlazorApp1.Data
 
 
 
-
-
         // Function used to get messages from database
         public async Task<List<Datamodel>> GetMessagesDbAsync()
         {
-           
-             List<Datamodel> listOfEmails = emailCollection.Find(x => x.handler.Equals("")).ToList();
+            
+                List<Datamodel> listOfEmails = emailCollection.Find(x => x.handler.Equals("")).ToList();
             return listOfEmails;
 
         }
 
+    public void AssingTicket(ObjectId id)
+        {
 
+            try
+            {
+                Datamodel ticket = emailCollection.Find(x => x.id == id).First();
+                ticket.handler = Thread.CurrentPrincipal.Identity.Name.ToString();
+            }
+            catch (InvalidCastException e)
+            {
+                Console.WriteLine(e);
+            }
+
+        }
 
     // Function used to get unreaded emails and insert them to database.
     public void GetEmails()
