@@ -19,8 +19,16 @@ build_property._RazorSourceGeneratorDebug =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Janne/Documents/tehtavat2022/Syksy/Ticketing-System/BlazorApp1/Pages/History.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSGlzdG9yeS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Janne/Documents/tehtavat2022/Syksy/Ticketing-System/BlazorApp1/Pages/Index.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Janne/Documents/tehtavat2022/Syksy/Ticketing-System/BlazorApp1/Pages/InProgress.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5Qcm9ncmVzcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Janne/Documents/tehtavat2022/Syksy/Ticketing-System/BlazorApp1/Pages/Loginpage.razor]

@@ -3,7 +3,6 @@
 @using BlazorApp1.Data
 @using System.Timers;
 @using Microsoft.Exchange.WebServices.Data;
-
 @using BlazorApp1.Models;
 @inject Emails Emailing
 @inject NavigationManager navManager;
@@ -23,21 +22,22 @@
 </style>
 <link href="/css/StyleSheet.css" rel="stylesheet" />
 
-<h1>Uudet tiketit</h1>
-
-<h1>@mongoDbList.Count()</h1>
-	   		
-<table>
-	 <tr>
+<h1>New Tickets (@mongoDbList.Count())</h1>
+	   
+   		<div style="height: 300px;
+    overflow: hidden; overflow-y: scroll; width:55vw; ">
+<table tickettable>
+	 <tr ticketobject>
     <th>Subject</th>
     <th>From</th>
     <th>Time</th>
+	    <th></th>
   </tr>
   
 
 @foreach (Datamodel message in mongoDbList)
 {
-		<tr>
+		<tr subjects>
 		<th>
 			@message.subject
 		</th>
@@ -119,6 +119,13 @@
 		}
 		}
 </table>
+</div>
+
+
+<br />
+<br />
+<h1>All tickets in progress (@mongoDbList.Count())</h1>
+
 @code {
 
 	[CascadingParameter]
@@ -133,6 +140,7 @@
 	private string emailId;
 	// List which is used to get objects from MongoDB database collection.
 	private List<Datamodel> mongoDbList;
+	private List<Datamodel> mongoDbListinProgress;
 	// Used to loop email conversation messages.
 	// Timer which is assigned 15 seconds (Updates every 5 seconds).
 	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(10));
@@ -155,13 +163,17 @@
 
 
 
-
+	private void DoNothing()
+	{
+		
+	}
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
 
 
 		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
 		mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
+		//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
 		RunTimer();
 	}
 
