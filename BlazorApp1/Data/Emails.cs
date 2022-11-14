@@ -195,18 +195,30 @@ namespace BlazorApp1.Data
 
 
 
-                        string replyMessage = "Tämä on järjestelmäpalvelun automaattinen viesti. Olemme vastaanottaneet tukipyyntösi ja se tullaan käsittelemään mahdollisimman pian." +
-                            "Jos haluat lähettää lisätietoja tukipyyntöösi liittyen, vastaa tähän sähköpostiin.\n" +
-                            "Tksystem palvelu";
-                        // This true
-                        bool replyToAll = true;
+
 
                         // While loop to check when message is readed, then sends reply mail.
                      while (message.IsRead == false)
                         {
                             message.Load();
+                     
                         }
-                      message.Reply(replyMessage, replyToAll);
+                     if(message.IsRead == true)
+						{
+                            string replyMessage = "Tämä on järjestelmäpalvelun automaattinen viesti. Olemme vastaanottaneet tukipyyntösi ja se tullaan käsittelemään mahdollisimman pian." +
+    "Jos haluat lähettää lisätietoja tukipyyntöösi liittyen, vastaa tähän sähköpostiin.\n" +
+    "Tksystem palvelu";
+
+                            message.Load(new PropertySet(ItemSchema.MimeContent));
+                            bool replyToAll = false;
+                            ResponseMessage responseMessage = message.CreateReply(replyToAll);
+                            responseMessage.BodyPrefix = replyMessage;
+                      
+                            responseMessage.SendAndSaveCopy();
+                            // This true
+                            //  bool replyToAll = true;
+                            //  message.Reply(replyMessage, replyToAll);
+                        }
                         
 
                         // The actual sending command with parameters.

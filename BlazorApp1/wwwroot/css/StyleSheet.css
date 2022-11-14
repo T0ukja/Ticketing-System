@@ -6,11 +6,74 @@ ul[b-3xxtam6d07] {
     font-size: 20px;
  
 }
+tr[ticketobject] {
+    text-align: center;
+    font-family: 'Arial Rounded MT';
+    font-size: 22px;
+    color:white;
+    background-color: darkblue;
+}
+    tr[ticketobject] th {
+        max-width: 55vw;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        padding-left: 1px;
+        padding-right: 1px;
+        border-bottom: 3px solid;
+    }
 
+        tr[ticketobject] th[buttons] {
+           
+        }
+
+tr[subjects] {
+    text-align: center;
+    font-family: 'Arial Rounded MT';
+    font-size: 18px;
+    background-color: lightblue;
+    border-left:5px;
+    border-right:5px;
+    width:100%;
+    align-content:center;
+    border-bottom: 3px solid;
+    color: black;
+}
+table[tickettable] {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    
+    
+    table-layout: fixed;
+    overflow: auto;
+}
 div[dialogbox] {
     display: block;
     width: 100vw;
+
     height: 70vh;
+}
+div[topbar] {
+    font-size: 15px;
+    display: flex;
+    clear: both;
+    align-items: center;
+   background-color: darkblue;
+}
+
+h3[alignleft] {
+    width: 1300px;
+    float: left;
+    margin-top:10px;
+    align-content:center;
+    vertical-align:middle;
+   
+}
+
+span[alignright] {
+    float: right;
+    line-height: 50px;
+
 }
 .logb {
     align-self: center;
@@ -56,3 +119,65 @@ div[container] {
 #GridID .k-grid-content {
     overflow-y: visible;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+body {
+    background: #8fb0a9;
+}
+
+.table-fixed {
+    margin-left: 25rem;
+    margin-top: 10rem;
+}
+
+    .table-fixed thead,
+    .table-fixed thead > th {
+        background: #4d7275;
+        color: #fff;
+    }
+
+    .table-fixed tbody tr td {
+        background: #fff;
+    }
+
+    .table-fixed > thead > tr > th {
+        border: 0 !important;
+    }
+
+    .table-fixed > tbody > tr > td:last-child {
+        border-right: 0;
+    }
+
+    .table-fixed tbody td,
+    .table-fixed thead > tr > th {
+        float: left;
+        font-size: 14px;
+        padding-left: 20px !important;
+    }
+
+    .table-fixed .col {
+        width: 25%;
+    }
+
+    .table-fixed tbody {
+        display: block;
+        height: 300px;
+        overflow-y: auto;
+    }
+
+    .table-fixed tr {
+        display: block;
+    }

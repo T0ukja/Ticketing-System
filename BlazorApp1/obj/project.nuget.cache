@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "GmckpjOruQ0tt9T8FJ/+vsxISc6hKgqpZ3zN1AhokV2tpsAoljj456UvA/6MFjx8SkI1Bf6v37g0rRaej0/Acw==",
+  "dgSpecHash": "3AXPCHVAtMpsCviofvAL70c73L6/41aBiCI8F1l/0VT4wa0CFO8tfKlQfVR4H6mo7SVHjj2FpVn0ck2azc38dQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\Janne\\Documents\\tehtavat2022\\Syksy\\Ticketing-System\\BlazorApp1\\BlazorApp1.csproj",
   "expectedPackageFiles": [
@@ -15,6 +15,7 @@
     "C:\\Users\\Janne\\.nuget\\packages\\microsoft.aspnetcore.components.forms\\6.0.7\\microsoft.aspnetcore.components.forms.6.0.7.nupkg.sha512",
     "C:\\Users\\Janne\\.nuget\\packages\\microsoft.aspnetcore.components.web\\6.0.7\\microsoft.aspnetcore.components.web.6.0.7.nupkg.sha512",
     "C:\\Users\\Janne\\.nuget\\packages\\microsoft.aspnetcore.metadata\\6.0.7\\microsoft.aspnetcore.metadata.6.0.7.nupkg.sha512",
+    "C:\\Users\\Janne\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Users\\Janne\\.nuget\\packages\\microsoft.exchange.webservices\\2.2.0\\microsoft.exchange.webservices.2.2.0.nupkg.sha512",
     "C:\\Users\\Janne\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\6.0.0\\microsoft.extensions.dependencyinjection.6.0.0.nupkg.sha512",
     "C:\\Users\\Janne\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\6.0.0\\microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512",
@@ -30,11 +31,16 @@
     "C:\\Users\\Janne\\.nuget\\packages\\mongodb.libmongocrypt\\1.6.0\\mongodb.libmongocrypt.1.6.0.nupkg.sha512",
     "C:\\Users\\Janne\\.nuget\\packages\\sharpcompress\\0.30.1\\sharpcompress.0.30.1.nupkg.sha512",
     "C:\\Users\\Janne\\.nuget\\packages\\snappier\\1.0.0\\snappier.1.0.0.nupkg.sha512",
+    "C:\\Users\\Janne\\.nuget\\packages\\syncfusion.blazor.buttons\\20.3.0.56\\syncfusion.blazor.buttons.20.3.0.56.nupkg.sha512",
+    "C:\\Users\\Janne\\.nuget\\packages\\syncfusion.blazor.core\\20.3.0.56\\syncfusion.blazor.core.20.3.0.56.nupkg.sha512",
+    "C:\\Users\\Janne\\.nuget\\packages\\syncfusion.licensing\\20.3.0.56\\syncfusion.licensing.20.3.0.56.nupkg.sha512",
     "C:\\Users\\Janne\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\Janne\\.nuget\\packages\\system.io.pipelines\\6.0.3\\system.io.pipelines.6.0.3.nupkg.sha512",
     "C:\\Users\\Janne\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "C:\\Users\\Janne\\.nuget\\packages\\system.security.accesscontrol\\5.0.0\\system.security.accesscontrol.5.0.0.nupkg.sha512",
     "C:\\Users\\Janne\\.nuget\\packages\\system.security.principal.windows\\5.0.0\\system.security.principal.windows.5.0.0.nupkg.sha512",
+    "C:\\Users\\Janne\\.nuget\\packages\\system.text.encodings.web\\6.0.0\\system.text.encodings.web.6.0.0.nupkg.sha512",
+    "C:\\Users\\Janne\\.nuget\\packages\\system.text.json\\6.0.0\\system.text.json.6.0.0.nupkg.sha512",
     "C:\\Users\\Janne\\.nuget\\packages\\zstdsharp.port\\0.6.2\\zstdsharp.port.0.6.2.nupkg.sha512"
   ],
   "logs": [

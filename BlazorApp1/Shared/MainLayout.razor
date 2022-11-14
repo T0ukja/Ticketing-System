@@ -3,6 +3,11 @@
 @inject NavigationManager navManager;
 @using BlazorApp1.Pages
 @using BlazorApp1.Authentication
+@using System.Timers
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"  />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/v4-font-face.min.css" />
+<link href="../iconify-icon.js" rel="stylesheet" />
+<link href="/css/StyleSheet.css" rel="stylesheet" />
 
 <PageTitle>BlazorApp1</PageTitle>
 <AuthorizeView>
@@ -24,16 +29,24 @@
         <NavMenu />
     </div>
     <main>
-        <div class="top-row px-1" style="justify-content: left;">
+        <div class="top-row px-1" >
         
-                                
+                        
+                    
         <Authorized>
+           <div topbar>
+  <h3 alignleft>Hello @context.User.Identity.Name @datetime</h3>
 
-                 <h3 align="left" style="text-align:right">Hello @context.User.Identity.Name</h3>
-                
+  <a @onclick="OpenSettings" href="javascript::void(0)"> <i class="fa fa-cog fa-2x"> </i></a>
+    <a  @onclick="LogOut" href="javascript::void(0)">    <i class="fa fa-sign-out fa-2x" aria-hidden="true"></i></a>   
+  
 
-           
-             <a @onclick="LogOut" href="javascript::void(0)">Logout</a>
+
+
+   
+</div>
+
+                 
 
 
         </Authorized>
@@ -53,9 +66,30 @@
 
 
 @code{
-    	[CascadingParameter]
-	private Task<AuthenticationState> authstat { get; set; 
-	}
+    public string datetime { get; set; }
+    public System.Timers.Timer aTimer;
+    private void timer1_Tick(object sender, EventArgs e)
+    {
+        aTimer = new System.Timers.Timer(2000);
+        // Hook up the Elapsed event for the timer. 
+        aTimer.Elapsed += OnTimedEvent;
+        aTimer.AutoReset = true;
+        aTimer.Enabled = true;
+    }
+    private static void OnTimedEvent(Object source, ElapsedEventArgs e)
+    {
+                
+
+    }
+    [CascadingParameter]
+    private Task<AuthenticationState> authstat { get; set; 
+    }
+
+
+
+    private async Task OpenSettings(){
+
+    }
         private async Task LogOut(){
          var customAuthenticationProvider = (CustomAuthenticationProvider)authStateProvider;
             await customAuthenticationProvider.UpdateAuthenticationState(null);
