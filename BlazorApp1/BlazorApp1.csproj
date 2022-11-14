@@ -17,6 +17,7 @@
     <PackageReference Include="Microsoft.Exchange.WebServices" Version="2.2.0" />
     <PackageReference Include="MongoDB.Bson" Version="2.18.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.18.0" />
+    <PackageReference Include="Syncfusion.Blazor.Buttons" Version="20.3.0.56" />
   </ItemGroup>
 
 </Project>

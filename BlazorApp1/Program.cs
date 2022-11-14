@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using BlazorApp1.Authentication;
 using BlazorStrap;
-
+using Syncfusion.Blazor;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -19,10 +19,7 @@ builder.Services.Configure<Settingsmodel>(
     builder.Configuration.GetSection("EmailDatabase"));
 builder.Services.Configure<Settingsmodel_login>(
     builder.Configuration.GetSection("LoginDatabase"));
-
-
-
-
+builder.Services.AddSyncfusionBlazor();
 // Session storage
 var app = builder.Build();
 
