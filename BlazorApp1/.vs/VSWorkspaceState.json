@@ -1,6 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Data",
+    "\\Pages"
   ],
+  "SelectedNode": "\\BlazorApp1.csproj",
   "PreviewInSolutionExplorer": false
 }
