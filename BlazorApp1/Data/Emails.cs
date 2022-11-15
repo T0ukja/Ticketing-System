@@ -128,14 +128,7 @@ namespace BlazorApp1.Data
 
    
         }
-        public async Task<List<Datamodel>> getHistory(){
-             var filter = Builders<Datamodel>.Filter.Ne("status", "Done");
-            List<Datamodel> historyList = emailCollection.Find(filter).ToList();
-
-
-
-            return historyList;
-        }
+  
 
         public async Task<List<Datamodel>> GetMessagesDBInProgressUserAsync(string name)
         {
@@ -146,7 +139,15 @@ namespace BlazorApp1.Data
 
 
         }
+        public async Task<List<Datamodel>> getHistory()
+        {
 
+            //var filter = Builders<Datamodel>.Filter.Ne("handler", name);
+            List<Datamodel> ListHistory = emailCollection.Find(x => x.status.Equals("Done")).ToList();
+            return ListHistory;
+
+
+        }
         public async Task<List<Datamodel>> GetMessagesDBInProgressAsync()
         {
 
