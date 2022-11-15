@@ -50,7 +50,6 @@ namespace BlazorApp1.Data
                     LoginModel loggedaccount = new LoginModel();
                     loggedaccount.username = DBuserLoginData.username;
                     loggedaccount.Role = DBuserLoginData.Role;
-                    _logger.LogInformation("moro");
 
                     return loggedaccount;
                   

@@ -7,6 +7,8 @@ using MongoDB.Driver;
 using BlazorApp1.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Components.Authorization;
+using BlazorApp1.Authentication;
 
 namespace BlazorApp1.Data
 {
@@ -22,9 +24,9 @@ namespace BlazorApp1.Data
          * */
         // Variable declares for MongoDB database.
         private readonly IMongoCollection<Datamodel> emailCollection;
-
         private MongoClient mongoClient { get; set; }
         private readonly IMongoDatabase mongoDatabase;
+        private readonly ILogger _logger;
 
 
         // Variables for setting credentials from txt file.
@@ -38,8 +40,9 @@ namespace BlazorApp1.Data
         private ExchangeService service;
 
 
-        public Emails(IOptions<Settingsmodel> settingsmodel, IMemoryCache memoryCache)
+        public Emails(IOptions<Settingsmodel> settingsmodel, IMemoryCache memoryCache, ILogger<Login> logger)
         {
+            _logger = logger;
             MemoryCache = memoryCache;
             // Settings model is used as class to read Mongodb
             // Settings Mongodb values from appsettings.json
@@ -125,22 +128,64 @@ namespace BlazorApp1.Data
 
    
         }
+        public async Task<List<Datamodel>> getHistory(){
+             var filter = Builders<Datamodel>.Filter.Ne("status", "Done");
+            List<Datamodel> historyList = emailCollection.Find(filter).ToList();
 
 
 
+            return historyList;
+        }
+
+        public async Task<List<Datamodel>> GetMessagesDBInProgressUserAsync(string name)
+        {
+
+            //var filter = Builders<Datamodel>.Filter.Ne("handler", name);
+            List<Datamodel> listOfJobsInProgress = emailCollection.Find(x => x.handler.Equals(name)).ToList();
+            return listOfJobsInProgress;
 
 
+        }
 
+        public async Task<List<Datamodel>> GetMessagesDBInProgressAsync()
+        {
+
+            var filter = Builders<Datamodel>.Filter.Ne("handler", "");
+            List<Datamodel> listOfJobsInProgress = emailCollection.Find(filter).ToList();
+                return listOfJobsInProgress;
+            
+          
+        }
         // Function used to get messages from database
         public async Task<List<Datamodel>> GetMessagesDbAsync()
         {
-           
-             List<Datamodel> listOfEmails = emailCollection.Find(x => x.handler.Equals("")).ToList();
+            
+                List<Datamodel> listOfEmails = emailCollection.Find(x => x.handler.Equals("")).ToList();
             return listOfEmails;
 
         }
 
+    public async void AssingTicket(string name, string messageid)
+        {
+           
+            // Try catch block to assign user object id to spesific ticket.
+            try
+            {
 
+                _logger.LogInformation("Emailing assing funktiossa");
+                var update = Builders<Datamodel>.Update.Set("handler", name);
+                var filter = Builders<Datamodel>.Filter.Eq("message_id", messageid);
+                Datamodel ticket = emailCollection.Find(x => x.message_id == messageid).FirstOrDefault();
+                var options = new UpdateOptions { IsUpsert = true };
+                emailCollection.UpdateOne(filter, update, options);
+               // _logger.LogInformation(ticket.subject.ToString());
+            }   
+            catch (InvalidCastException e)
+            {
+                _logger.LogInformation(e.ToString());
+            }
+
+        }
 
     // Function used to get unreaded emails and insert them to database.
     public void GetEmails()
