@@ -7,6 +7,7 @@
 @using BlazorApp1.Models;
 @using Microsoft.AspNetCore.Identity;
 @using System.Security.Claims
+@using MongoDB.Bson
 @inject Emails Emailing
 @inject NavigationManager navManager;
 @inject IJSRuntime JSRuntime
@@ -14,7 +15,12 @@
 @inject AuthenticationStateProvider authStateProvider;
 @inject AuthenticationStateProvider context;
 
+<style>
 
+	body{
+		background-color: #92c5ef;
+	}
+</style>
 
 <PageTitle>TkSystem</PageTitle>
 
@@ -101,10 +107,21 @@
 								
 
 									</tr>
-
-									<button type="button" class="close" @onclick="() => SendMail()">Answer</button>
+											@if(isPressed == false)
+											{
+													<button type="button" class="close" @onclick="() => SendMail(message.id)">Answer</button>
 									<button type="button" class="close" @onclick="() => ResponseMail()">Response</button>
 
+											}
+											else{
+
+													<div class="modal-dialog modal-lg">
+														<p>
+															Moro
+														</p>
+														</div>
+											}
+										
 
 						</div>
 
@@ -212,7 +229,7 @@
 
 									</tr>
 
-									<button type="button" class="close" @onclick="() => SendMail()">Forward</button>
+									<button type="button" class="close" @onclick="() => SendMail(message.id)">Forward</button>
 									<button type="button" class="close" @onclick="() => ResponseMail()">Response</button>
 
 
@@ -235,13 +252,15 @@
 		}
 </table>
 </div>
+
 @code {
 
 
 	private AuthenticationState authstate;
-	
-	        [CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
-			        private ClaimsPrincipal? user;
+	bool isPressed = false;
+
+	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
+	private ClaimsPrincipal? user;
 
 	// Timer variable declaration.
 	private static System.Timers.Timer aTimer;
@@ -249,7 +268,7 @@
 	private string emailId;
 	// List which is used to get objects from MongoDB database collection.
 	private List<Datamodel> mongoDbList;
-		//private List<Datamodel> mongoDBListJobsInProgress;
+	//private List<Datamodel> mongoDBListJobsInProgress;
 
 	private List<Datamodel> mongoDbListinProgress;
 	// Used to loop email conversation messages.
@@ -273,7 +292,7 @@
 	}
 	private async System.Threading.Tasks.Task AssingTickett(string name, string id){
 
-	               
+
 
 		Emailing.AssingTicket(name, id);
 	}
@@ -281,27 +300,29 @@
 
 	private void DoNothing()
 	{
-		
+
 	}
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
 		var state = await provider;
-            // This is the current logged in user
-            user = state.User;
+		// This is the current logged in user
+		user = state.User;
 
-			mongoDbListinProgress= await Emailing.GetMessagesDBInProgressAsync();
+		mongoDbListinProgress= await Emailing.GetMessagesDBInProgressAsync();
 		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
 		mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
-		//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
+																//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
 		RunTimer();
 	}
 
 	void ResponseMail()
 	{
-
 	}
-	void SendMail()
-	{
+	void SendMail(ObjectId objectid)
+	{		
+		
+		isPressed = true;
+
 		
 	}
 	void ClosePopup()

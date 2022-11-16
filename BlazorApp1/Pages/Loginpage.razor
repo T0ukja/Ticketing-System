@@ -10,16 +10,22 @@
 @inject IJSRuntime JSRuntime
 
 <link href="/css/StyleSheet.css" rel="stylesheet" />
+<body logpage>
+    
+<style>
 
-  <style>
+	body{
+		background-color: #A5C6FF;
+	}
+</style>
 
-  </style>
+
 
   <AuthorizeView>
       <NotAuthorized>
-          <div class="col-6" container>
+          <div container>
     
-       <div main>
+       <div>
               <h3 style="text-align:center; font-size:40px;">Login</h3>
             <p>
     <input @bind="logusername" />
@@ -33,19 +39,26 @@
 
 </p>
 
-<button type="button" class="logb" @onclick="()=> CheckLogin(logusername,logPassword)">
-    Login
-</button>
-  
+
+           
+                        <button type="button" class="btn btn-outline-primary" @onclick="()=>CheckLogin(logusername,logPassword)" >Login</button>
+
+
+
+   
+
+     
+ 
        </div>
 
 
 </div>
+
       </NotAuthorized>
   </AuthorizeView>
   
 
-
+  </body>
 
 
 
