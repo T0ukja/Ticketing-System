@@ -6,8 +6,19 @@ using Microsoft.AspNetCore.Components.Web;
 using BlazorApp1.Authentication;
 using BlazorStrap;
 using Syncfusion.Blazor;
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services
+    .AddBlazorise(options =>
+    {
+        options.Immediate = true;
+
+    })
+    .AddBootstrapProviders()
+    .AddFontAwesomeIcons();
 // Add services to the container.
 builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorPages();
@@ -20,6 +31,8 @@ builder.Services.Configure<Settingsmodel>(
 builder.Services.Configure<Settingsmodel_login>(
     builder.Configuration.GetSection("LoginDatabase"));
 builder.Services.AddSyncfusionBlazor();
+
+
 // Session storage
 var app = builder.Build();
 

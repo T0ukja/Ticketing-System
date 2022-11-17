@@ -1,5 +1,11 @@
 ﻿
-
+@using BlazorApp1.Data
+@using System.Timers;
+@using Microsoft.Exchange.WebServices.Data;
+@using BlazorApp1.Models;
+@using Microsoft.AspNetCore.Identity;
+@using System.Security.Claims
+@using MongoDB.Bson
    <AuthorizeView>
      
 
@@ -28,14 +34,34 @@
                 <span class="oi oi-home" aria-hidden="true"></span> Your tickets
             </NavLink>
         </div>
-    
+
+     
+
+    @if(user.IsInRole("Administrator")){
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="register">
+                <span class="oi oi-home" aria-hidden="true"></span> register
+            </NavLink>
+        </div>  
+    }
+                
+         
        
     </nav>
 </div>
     </AuthorizeView>
 @code {
-    private bool collapseNavMenu = true;
 
+    [CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
+    private ClaimsPrincipal? user;
+
+    private bool collapseNavMenu = true;
+	protected override async System.Threading.Tasks.Task OnInitializedAsync()
+    {
+            	var state = await provider;
+		// This is the current logged in user
+		user = state.User;
+    }
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()

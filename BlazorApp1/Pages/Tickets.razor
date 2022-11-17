@@ -7,6 +7,7 @@
 @using BlazorApp1.Models;
 @using Microsoft.AspNetCore.Identity;
 @using System.Security.Claims
+@using MongoDB.Bson
 @inject Emails Emailing
 @inject NavigationManager navManager;
 @inject IJSRuntime JSRuntime
@@ -14,7 +15,12 @@
 @inject AuthenticationStateProvider authStateProvider;
 @inject AuthenticationStateProvider context;
 
+<style>
 
+	body{
+		background-color: #92c5ef;
+	}
+</style>
 
 <PageTitle>TkSystem</PageTitle>
 
@@ -61,8 +67,9 @@
 
 		@if (emailChain != null && message.message_id.ToString().Equals(emailId) && ShowPopUp)
 		{
-			<div class="modal" tabindex="-1" dialogbox role="dialog">
-				<div class="modal-dialog modal-lg">
+				dialogOpen = true;
+				<div class="modal" tabindex="-1" dialogbox role="dialog" >
+				<div class="modal-dialog modal-lg" >
 					<div class="modal-content">
 						<div class="modal-header" style="align-self:center;" >
 						
@@ -101,10 +108,36 @@
 								
 
 									</tr>
+											@if(isPressed == false)
+											{
+													<button type="button" class="close" @onclick="() => SendMail(item.Id)">Answer</button>
+												<button type="button" class="close" @onclick="()=> SendForwardMessage(item.Id)">Forward Message</button>
 
-									<button type="button" class="close" @onclick="() => SendMail()">Answer</button>
-									<button type="button" class="close" @onclick="() => ResponseMail()">Response</button>
+											}
+										
+												@if (item.Id == messageid)
+												{
+													<div style="border:3px solid black; margin-top:10px; margin-bottom;10px; margin-left:10px; margin-right:10px; background-color:lightblue;">
+														
+														         <p>Input
+																<input @bind="emailadress" />
+																	</p>
+													
+													  <p>Input
+																<input @bind="cc" />
+																	</p>
+																	  <p>Input
+																<input @bind="textbox" style="width: 650px; height: 150px;"/>
+																	</p>
 
+														<button type="button" class="close" @onclick="() => SendMailReply(item.Id)">Send Mail</button>
+								
+	
+													</div>
+												}
+												
+											
+										
 
 						</div>
 
@@ -115,7 +148,6 @@
 						
 						</div>
 											<button type="button" class="close" @onclick="()=> ClosePopup()"> Close</button>
-
 					</div>
 				</div>
 			</div>
@@ -132,7 +164,10 @@
 
 <br />
 <br />
-<h1>All tickets in progress (@mongoDbListinProgress.Count())</h1>
+
+
+
+	<h1>All tickets in progress (@mongoDbListinProgress.Count())</h1>
    		<div style="height: 300px;
     overflow: hidden; overflow-y: scroll; width:55vw; ">
 <table tickettable>
@@ -212,8 +247,8 @@
 
 									</tr>
 
-									<button type="button" class="close" @onclick="() => SendMail()">Forward</button>
-									<button type="button" class="close" @onclick="() => ResponseMail()">Response</button>
+									<button type="button" class="close" @onclick="() => SendMail(item.Id)">Forward</button>
+									<button type="button" class="close" @onclick="()=> SendForwardMessage(item.Id)">Forward Message</button>
 
 
 						</div>
@@ -235,13 +270,21 @@
 		}
 </table>
 </div>
+
+
+
+
 @code {
-
-
+	private string emailadress{get;set;}
+	private string cc{get;set;}
+	private string textbox{ get; set; }
+	private bool dialogOpen = false;
 	private AuthenticationState authstate;
-	
-	        [CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
-			        private ClaimsPrincipal? user;
+	bool isPressed = false;
+
+	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
+	private ClaimsPrincipal? user;
+	private ItemId messageid;
 
 	// Timer variable declaration.
 	private static System.Timers.Timer aTimer;
@@ -249,8 +292,8 @@
 	private string emailId;
 	// List which is used to get objects from MongoDB database collection.
 	private List<Datamodel> mongoDbList;
-		//private List<Datamodel> mongoDBListJobsInProgress;
-
+	//private List<Datamodel> mongoDBListJobsInProgress;
+	private string type;
 	private List<Datamodel> mongoDbListinProgress;
 	// Used to loop email conversation messages.
 	// Timer which is assigned 15 seconds (Updates every 5 seconds).
@@ -273,36 +316,55 @@
 	}
 	private async System.Threading.Tasks.Task AssingTickett(string name, string id){
 
-	               
+
 
 		Emailing.AssingTicket(name, id);
 	}
 
 
-	private void DoNothing()
+
+	private void SendMailReply(ItemId id)
 	{
-		
+		// Need's send mail function
+		type = "Reply";
+		isPressed = false;
+		messageid = null;
+		StateHasChanged();
+
+
 	}
+	private void SendForwardMessage(ItemId id)
+	{
+		type = "Forward";
+	}
+	private void ChangeValue()
+	{
+		isPressed = false;
+		messageid = null;
+		StateHasChanged();
+
+	}
+
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
 		var state = await provider;
-            // This is the current logged in user
-            user = state.User;
+		// This is the current logged in user
+		user = state.User;
 
-			mongoDbListinProgress= await Emailing.GetMessagesDBInProgressAsync();
+		mongoDbListinProgress= await Emailing.GetMessagesDBInProgressAsync();
 		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
 		mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
-		//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
+																//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
 		RunTimer();
 	}
 
-	void ResponseMail()
-	{
 
-	}
-	void SendMail()
-	{
-		
+	void SendMail(ItemId objectid)
+	{		
+
+		isPressed = true;
+		messageid = objectid;
+
 	}
 	void ClosePopup()
     {

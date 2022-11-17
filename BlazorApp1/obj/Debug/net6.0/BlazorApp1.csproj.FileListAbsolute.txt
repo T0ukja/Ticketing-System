@@ -84,3 +84,6 @@ C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debu
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Syncfusion.Blazor.Buttons.dll
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Syncfusion.Blazor.Core.dll
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Syncfusion.Licensing.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Blazorise.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Blazorise.Bootstrap.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Blazorise.Icons.FontAwesome.dll

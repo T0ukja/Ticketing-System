@@ -2,26 +2,86 @@
 
 @using BlazorApp1.Data
 @attribute [Authorize(Roles = "Administrator")]
-
+@inject IJSRuntime JSRuntime
 @inject Login login
+
+<style>
+
+	body{
+		background-color: #92c5ef;
+	}
+</style>
 <h3>Register</h3>
 <div>
     <p>
+        UserName
+    </p>
+    <p>
+     
     <input @bind="registeru" />
 </p>
+  <p>
+        Password
+    </p>
 <p>
     <input @bind="registerp" />
 </p>
-<button type="button" class="close" @onclick="()=> CreateUser(registeru,registerp)">
-    Login
+<div style = "width:100px;">
+       <ListGroup Mode="ListGroupMode.Selectable" @bind-SelectedItem="selecterRole">
+    <ListGroupItem Name="Administrator">Admin</ListGroupItem>
+    <ListGroupItem Name="HelpDesk">HelpDesk</ListGroupItem>
+</ListGroup>
+</div>
+<button type="button" class="close" @onclick="()=> CreateUser(registeru,registerp,selecterRole)">
+    Register
 </button>
 
 </div>
+
+
+ 
+            <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="Submit" />  
 @code {
-	    private async Task CreateUser(string registeru, string registerp) {
-       await login.CreateNewUser(registeru, registerp, "Administrator");
+
+    private string selecterRole;
+
+    private async Task CreateUser(string registeru, string registerp, string type) {
+        if(selecterRole == null || registeru == "" || registerp == "")
+        {
+                    await JSRuntime.InvokeVoidAsync("alert", "Fill all needed values for user");
+
+        }
+        else
+        {
+                    await login.CreateNewUser(registeru, registerp, type);
+
+        }
 
     }
 	    private string? registeru { get; set; }
     private string? registerp { get; set; }
+
+    /*
+     *     <form id="form1" runat="server">  
+        <p>Select role</p>  
+        <div>  
+         <Dropdown>
+    <DropdownToggle Color="Color.Primary">
+        Dropdown
+    </DropdownToggle>
+    <DropdownMenu>
+        <DropdownItem>Action</DropdownItem>
+        <DropdownDivider />
+        <DropdownItem>Another Action</DropdownItem>
+    </DropdownMenu>
+</Dropdown>
+    
+        </div>  
+        <br />  
+        <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="Submit" />  
+        <br />  
+        <br />  
+        <asp:Label ID="Label1" runat="server" EnableViewState="False"></asp:Label>  
+    </form> 
+     */
 }
