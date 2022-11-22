@@ -96,7 +96,7 @@ namespace BlazorApp1.Data
        // Properties for what to return for each email.
        PropertySet properties = new PropertySet(BasePropertySet.IdOnly,
                                                  ItemSchema.Subject,
-                                                 ItemSchema.DateTimeReceived, ItemSchema.TextBody, ItemSchema.IsFromMe, ItemSchema.DisplayTo,ItemSchema.DisplayCc,ItemSchema.MimeContent, EmailMessageSchema.From);
+                                                 ItemSchema.DateTimeReceived, ItemSchema.TextBody, ItemSchema.IsFromMe);
 
        // Identify the folders to ignore.
        Collection<FolderId> foldersToIgnore = new Collection<FolderId>() { WellKnownFolderName.DeletedItems, WellKnownFolderName.Drafts };
@@ -137,36 +137,6 @@ namespace BlazorApp1.Data
             List<Datamodel> listOfJobsInProgress = emailCollection.Find(x => x.handler.Equals(name)).ToList();
             return listOfJobsInProgress;
 
-
-        }
-        public async void SendMail(string id, string messageconversationid,string type, string addparam, string text, string cc)
-        {
-            _logger.LogInformation("Sendmail funktiossa");
-
-            FindItemsResults<Item> findResults;
-              service.Url = new Uri(emailurl);
-            int offSet = 0;
-            // How many to get at function call (loads this many messages at one time).
-            int pageSize = 20;
-            //ExtendedPropertyDefinition PidTagInternetMessageId = new ExtendedPropertyDefinition(4149, MapiPropertyType.ObjectId);
-            // finds results from email folder (this is set to Inbox).
-            SearchFilter sf = new SearchFilter.IsEqualTo(EmailMessageSchema.Id, id);
-            ItemView view = new ItemView(pageSize, offSet, OffsetBasePoint.Beginning);
-            findResults = service.FindItems(WellKnownFolderName.Inbox, sf, view);
-           foreach(EmailMessage item in findResults.Items)
-            {
-
-                ResponseMessage response = item.CreateReply(false);
-                response.BodyPrefix = text;
-             
-                response.SendAndSaveCopy();
-
-            }
-            /*
-             *       ResponseMessage response = item.CreateReply(false);
-                 response.BodyPrefix = text;
-                 response.SendAndSaveCopy();
-            */
 
         }
         public async Task<List<Datamodel>> getHistory()
