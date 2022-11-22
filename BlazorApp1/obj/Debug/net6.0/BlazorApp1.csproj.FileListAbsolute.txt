@@ -46,7 +46,6 @@ C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debu
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\BlazorApp1.deps.json
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\BlazorApp1.runtimeconfig.json
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\BlazorApp1.dll
-C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\ref\BlazorApp1.dll
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\BlazorApp1.pdb
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Microsoft.Exchange.WebServices.Auth.dll
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Microsoft.Exchange.WebServices.dll
@@ -87,3 +86,9 @@ C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debu
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Blazorise.dll
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Blazorise.Bootstrap.dll
 C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\bin\Debug\net6.0\Blazorise.Icons.FontAwesome.dll
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\obj\Debug\net6.0\staticwebassets\msbuild.BlazorApp1.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\obj\Debug\net6.0\staticwebassets\msbuild.build.BlazorApp1.props
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\obj\Debug\net6.0\staticwebassets\msbuild.buildMultiTargeting.BlazorApp1.props
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\obj\Debug\net6.0\staticwebassets\msbuild.buildTransitive.BlazorApp1.props
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\obj\Debug\net6.0\staticwebassets.pack.json
+C:\Users\Janne\Documents\tehtavat2022\Syksy\Ticketing-System\BlazorApp1\obj\Debug\net6.0\refint\BlazorApp1.dll

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "awX7l5syUN+vR8PgumUQug51SjzRlzKnu/xrb8RDmRJWgkpv4PuimgZ3UylO45oRnSdg2pJeKSTkP0/YAGClug==",
+  "dgSpecHash": "fx8xVUiq69hMPxxmYz8HiwyGyKybPfSLmvgYbTYCCNNz3JyvpUawS2t14BAPYU4FjPsAKV+3bLRBNRBopeqyXQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\Janne\\Documents\\tehtavat2022\\Syksy\\Ticketing-System\\BlazorApp1\\BlazorApp1.csproj",
   "expectedPackageFiles": [
@@ -51,7 +51,7 @@
       "code": "NU1701",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Package 'Microsoft.Exchange.WebServices 2.2.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework 'net6.0'. This package may not be fully compatible with your project.",
+      "message": "Package 'Microsoft.Exchange.WebServices 2.2.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net6.0'. This package may not be fully compatible with your project.",
       "libraryId": "Microsoft.Exchange.WebServices",
       "targetGraphs": [
         "net6.0"
