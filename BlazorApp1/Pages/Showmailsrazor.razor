@@ -1,4 +1,10 @@
-﻿@using System.Collections.ObjectModel;
+﻿
+
+
+
+
+
+@using System.Collections.ObjectModel;
 @using BlazorApp1.Authentication
 @using BlazorApp1.Data
 @using System.Timers;
@@ -88,10 +94,38 @@
 ">
 
 												<div style="margin-left:50px; justify-content:center;">
-													To : @item.DisplayTo.ToString()
+													From : @item.From.Address.ToString()
+													<br />
+													@if (@item.ToRecipients.Count != 0)
+													{
+
+
+
+
+														<p style="display:flex;">
+															To :
+															@foreach (EmailAddress emailmessaage in item.ToRecipients)
+															{
+															<p>	@emailmessaage.Address.ToString(), </p>
+															}
+														</p>
+													}
 
 													<br />
-													From : @item.From.Address.ToString()
+													@if (@item.CcRecipients.Count != 0)
+													{
+
+
+
+
+														<p style="display:flex;">
+															CC :
+															@foreach (EmailAddress emailmessaage in item.CcRecipients)
+															{
+															<p>	@emailmessaage.Address.ToString(), </p>
+															}
+														</p>
+													}
 
 												</div>
 
@@ -103,12 +137,12 @@
 
 
 
-														<a href="javascript::void(0)" @onclick="()=>SendReply(item.Id)">
+														<a href="javascript::void(0)" @onclick="()=>ReplyButton(item.Id, item, item.IsFromMe)">
 
 															<i aa class="fa fa-reply fa-2x" aria-hidden="true"></i>
 														</a>
 
-														<a href="javascript::void(0)" @onclick="()=>SendReplyAll(item.Id)">
+														<a href="javascript::void(0)" @onclick="()=>SendReplyAll(item.Id, item, item.IsFromMe)">
 															<i aa class="fa fa-reply-all fa-2x" aria-hidden="true"></i>
 														</a>
 														<a href="javascript::void(0)" @onclick="()=>SendForwardMessage(item.Id)">
@@ -160,12 +194,62 @@
 
 
 													<div style="border:3px solid black; margin-top:10px; margin-bottom;10px; margin-left:10px; margin-right:10px; background-color:lightblue;">
+														<div style="display:flex;">
+															<p>
+																Add receivers
+																<input @bind="InputFrom" style="width: 380px; height: 20px;" />
+															</p>
+															<button type="button" class="btn btn-outline-primary rounded-circle" style="width:40px; height:40px" @onclick="() => AddReceiver(InputFrom,receiverList)">
+																<i class="fa fa-plus" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
+															</button>
 
+
+														</div>
+														<div style="display:flex;">
+															<p>
+																Add CC
+																<input @bind="cc" style="width: 380px; height: 20px;" />
+															</p>
+															<button type="button" class="btn btn-outline-primary rounded-circle" style="width:40px; height:40px" @onclick="() => AddReceiver(textbox, CCList)">
+																<i class="fa fa-plus" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
+															</button>
+														</div>
+
+														@if (receiverList != null)
+														{
+
+															@foreach (string receiver in receiverList)
+															{
+																<p>To</p>
+																<div style="display:flex; width: 300px;  margin-left:50px;">
+
+																	<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">@receiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(receiver, receiverList)">
+																		<i class="fa fa-window-close fa-2x" aria-hidden="true" style="align-content:center;justify-content: center; display:flex;"></i>
+																	</button>
+																</div>
+															}
+
+
+														}
+														@if (CCList != null)
+														{
+
+															@foreach (string receiver in CCList)
+															{
+																<p>CC</p>
+																<div style="display:flex; width: 300px;  margin-left:50px;">
+
+																	<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">@receiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(receiver, receiverList)">
+																		<i class="fa fa-window-close fa-2x" aria-hidden="true" style="align-content:center;justify-content: center; display:flex;"></i>
+																	</button>
+																</div>
+															}
 
 														<p>
 															Input
 															<input @bind="textbox" style="width: 90%; height: 150px;" />
 														</p>
+
 
 														<button type="button" class="btn btn-outline-primary rounded-circle" style="Width:50px; Height:50px;" @onclick="() => SendReply(item.Id.ToString(), message.message_id)">
 															<i class="fa fa-paper-plane fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
@@ -193,6 +277,39 @@
 															CC
 															<input @bind="cc" />
 														</p>
+														<p>Address List</p>
+														@if (receiverList != null)
+														{
+															<p>To</p>
+
+															@foreach (string receiver in receiverList)
+															{
+																<div style="display:flex; width: 300px;  margin-left:50px;">
+
+																	<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">@receiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(receiver, receiverList)">
+																		<i class="fa fa-window-close fa-2x" aria-hidden="true" style="align-content:center;justify-content: center; display:flex;"></i>
+																	</button>
+																</div>
+															}
+
+
+
+														}
+
+														@if (CCList != null)
+														{
+															<p>CC</p>
+
+															@foreach (string receiver in CCList)
+															{
+																<div style="display:flex; width: 300px;  margin-left:50px;">
+
+																	<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">CC @receiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(receiver, CCList)">
+																		<i class="fa fa-window-close fa-2x" aria-hidden="true" style="align-content:center;justify-content: center; display:flex;"></i>
+																	</button>
+																</div>
+															}
+														}
 														<p>
 															Input
 															<input @bind="textbox" style="width: 90%; height: 150px;" />
@@ -210,7 +327,7 @@
 
 
 
-											}
+
 
 
 
@@ -236,11 +353,14 @@
 @code {
 	private ItemId itemidhistory { get; set; }
 	private string emailadress { get; set; }
+	private string InputFrom { get; set; }
 	private string cc { get; set; }
 	private string textbox { get; set; }
 	private bool dialogOpen = false;
 	private AuthenticationState authstate;
 	bool isPressed = false;
+	private List<string> receiverList;
+	private List<string> CCList;
 
 	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
 	private ClaimsPrincipal? user;
@@ -281,8 +401,29 @@
 
 		Emailing.AssingTicket(name, id);
 	}
+	private void DeleteReceiver(string receiver, List<string> lista)
+	{
+		lista.Remove(receiver);
+	}
 
 
+	private void AddReceiver(string receiver, List<string> lista)
+	{
+		if (lista.Contains(receiver))
+		{
+
+		}
+
+		else
+		{
+			if (receiver != "")
+			{
+				lista.Add(receiver);
+			}
+
+
+		}
+	}
 	private void ShowHistory(ItemId itemid)
 	{
 		if (buttonStatus == 1)
@@ -308,6 +449,7 @@
 		// Need's send mail function
 		isPressed = false;
 		messageid = null;
+
 		StateHasChanged();
 
 		Emailing.SendMail(id, conversationid, type, "", textbox, "");
@@ -332,6 +474,7 @@
 
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
+
 		var state = await provider;
 		// This is the current logged in user
 		user = state.User;
@@ -342,23 +485,71 @@
 																//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
 		RunTimer();
 	}
+	void loopdata(EmailMessage messageitem)
+	{
+
+		foreach (EmailAddress item in messageitem.ToRecipients)
+		{
+			receiverList.Add(item.Address);
+
+		}
 
 
-	void SendReply(ItemId objectid)
+		if (messageitem.CcRecipients.Count().Equals(1))
+		{
+
+			foreach (EmailAddress item in messageitem.CcRecipients)
+			{
+				CCList.Add(item.Address.ToString());
+
+			}
+		}
+		else
+		{
+			foreach (EmailAddress item in messageitem.CcRecipients)
+			{
+				CCList.Add(item.Address.ToString());
+			}
+		}
+
+
+	}
+
+	void ReplyButton(ItemId objectid, EmailMessage messageitem, bool isFromMe)
 	{
 		type = "Reply";
 
 		isPressed = true;
 		messageid = objectid;
+		receiverList = new List<string>();
+		CCList = new List<string>();
+
+		EmailAddress item = messageitem.ToRecipients[0];
+
+		if (isFromMe.Equals(false))
+		{
+			receiverList.Add(messageitem.From.Address.ToString());
+
+
+		}
+		else
+		{
+			receiverList.Add(item.Address.ToString());
+
+		}
+
 
 
 	}
-	void SendReplyAll(ItemId objectid)
+	void SendReplyAll(ItemId objectid, EmailMessage messageitem, bool isFromMe)
 	{
 		type = "ReplyAll";
 
 		isPressed = true;
 		messageid = objectid;
+		receiverList = new List<string>();
+		CCList = new List<string>();
+		loopdata(messageitem);
 
 
 	}
