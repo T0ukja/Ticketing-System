@@ -96,7 +96,7 @@ namespace BlazorApp1.Data
 				// Properties for what to return for each email.
 				PropertySet properties = new PropertySet(BasePropertySet.IdOnly,
 														  ItemSchema.Subject,
-														  ItemSchema.DateTimeReceived, ItemSchema.TextBody, ItemSchema.IsFromMe, ItemSchema.DisplayTo, ItemSchema.DisplayCc, ItemSchema.MimeContent, EmailMessageSchema.From,EmailMessageSchema.ToRecipients,EmailMessageSchema.ToRecipients);
+														  ItemSchema.DateTimeReceived, ItemSchema.TextBody, ItemSchema.IsFromMe, ItemSchema.DisplayTo, ItemSchema.DisplayCc, ItemSchema.MimeContent, EmailMessageSchema.From,EmailMessageSchema.ToRecipients,EmailMessageSchema.CcRecipients);
 
 				// Identify the folders to ignore.
 				Collection<FolderId> foldersToIgnore = new Collection<FolderId>() { WellKnownFolderName.DeletedItems, WellKnownFolderName.Drafts };
