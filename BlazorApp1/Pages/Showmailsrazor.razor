@@ -210,17 +210,17 @@
 																Add CC
 																<input @bind="cc" style="width: 380px; height: 20px;" />
 															</p>
-															<button type="button" class="btn btn-outline-primary rounded-circle" style="width:40px; height:40px" @onclick="() => AddReceiver(textbox, CCList)">
+															<button type="button" class="btn btn-outline-primary rounded-circle" style="width:40px; height:40px" @onclick="() => AddReceiver(cc, CCList)">
 																<i class="fa fa-plus" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
 															</button>
 														</div>
 
 														@if (receiverList != null)
 														{
-
+															<p>To</p>
 															@foreach (string receiver in receiverList)
 															{
-																<p>To</p>
+																
 																<div style="display:flex; width: 300px;  margin-left:50px;">
 
 																	<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">@receiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(receiver, receiverList)">
@@ -233,10 +233,10 @@
 														}
 														@if (CCList != null)
 														{
-
+															<p>CC</p>
 															@foreach (string receiver in CCList)
 															{
-																<p>CC</p>
+															
 																<div style="display:flex; width: 300px;  margin-left:50px;">
 
 																	<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">@receiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(receiver, receiverList)">
@@ -251,7 +251,7 @@
 														</p>
 
 
-														<button type="button" class="btn btn-outline-primary rounded-circle" style="Width:50px; Height:50px;" @onclick="() => SendReply(item.Id.ToString(), message.message_id)">
+														<button type="button" class="btn btn-outline-primary rounded-circle" style="Width:50px; Height:50px;" @onclick="() => SendReply(item.Id.ToString(),receiverList,CCList)">
 															<i class="fa fa-paper-plane fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
 														</button>
 														<button type="button" class="btn btn-outline-primary rounded-circle" style="width:50px; height:50px;" @onclick="()=>{isPressed = false; messageid = null; StateHasChanged();}">
@@ -314,7 +314,7 @@
 															Input
 															<input @bind="textbox" style="width: 90%; height: 150px;" />
 														</p>
-														<button type="button" class="btn btn-outline-primary rounded-circle" style="Width:50px; Height:50px;" @onclick="() => SendReply(item.Id.ToString(), message.message_id)">
+														<button type="button" class="btn btn-outline-primary rounded-circle" style="Width:50px; Height:50px;" @onclick="() => SendReply(item.Id.ToString(),receiverList,CCList)">
 															<i class="fa fa-paper-plane fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
 														</button>
 														<button type="button" class="btn btn-outline-primary rounded-circle" style="width:50px; height:50px;" @onclick="()=>{isPressed = false; messageid = null; StateHasChanged();}">
@@ -444,7 +444,7 @@
 
 
 
-	private async System.Threading.Tasks.Task SendReply(string id, string conversationid)
+	private async System.Threading.Tasks.Task SendReply(ItemId id, List<string> receivers, List<string> ccreceivers)
 	{
 		// Need's send mail function
 		isPressed = false;
@@ -452,8 +452,10 @@
 
 		StateHasChanged();
 
-		Emailing.SendMail(id, conversationid, type, "", textbox, "");
+		Emailing.SendMail(id, textbox, receivers,ccreceivers);
 		//ItemId id, ObjectId messageconversationid,string type, string addparam, string text, string cc,)
+		CCList = null;
+		receiverList = null;
 	}
 	private void SendForwardMessage(ItemId id)
 	{
