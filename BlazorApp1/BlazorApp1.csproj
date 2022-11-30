@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Pages\StatusWindow.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Pages\StatusWindow.razor" />
     <None Include="wwwroot\css\StyleSheet.css" />
   </ItemGroup>
 
@@ -20,6 +25,14 @@
     <PackageReference Include="MongoDB.Bson" Version="2.18.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.18.0" />
     <PackageReference Include="Syncfusion.Blazor.Buttons" Version="20.3.0.56" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Pages\StatusWindow.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\StatusWindow.razor" />
   </ItemGroup>
 
 </Project>
