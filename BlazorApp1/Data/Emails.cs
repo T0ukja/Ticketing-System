@@ -139,7 +139,7 @@ namespace BlazorApp1.Data
 
 
 		}
-		public async void SendMail(string id, string messageconversationid, string type, string addparam, string text, string cc)
+		public async void SendMail(ItemId id, string text, List<string> receiversList, List<string> CCList)
 		{
 			_logger.LogInformation("Sendmail funktiossa");
 
@@ -150,18 +150,31 @@ namespace BlazorApp1.Data
 			int pageSize = 20;
 			//ExtendedPropertyDefinition PidTagInternetMessageId = new ExtendedPropertyDefinition(4149, MapiPropertyType.ObjectId);
 			// finds results from email folder (this is set to Inbox).
-			SearchFilter sf = new SearchFilter.IsEqualTo(EmailMessageSchema.Id, id);
-			ItemView view = new ItemView(pageSize, offSet, OffsetBasePoint.Beginning);
-			findResults = service.FindItems(WellKnownFolderName.Inbox, sf, view);
-			foreach (EmailMessage item in findResults.Items)
-			{
+			//	SearchFilter sf = new SearchFilter.IsEqualTo(EmailMessageSchema.Id, id);
+			//	ItemView view = new ItemView(pageSize, offSet, OffsetBasePoint.Beginning);
+			//	findResults = service.FindItems(WellKnownFolderName.Inbox, sf, view);
+			//	foreach (EmailMessage item in findResults.Items)
+			//	{
+			PropertySet propSet = new PropertySet(BasePropertySet.IdOnly, ItemSchema.LastModifiedTime);
+			EmailMessage message = EmailMessage.Bind(service, id, propSet);
 
-				ResponseMessage response = item.CreateReply(false);
+		ResponseMessage response = message.CreateReply(false);
 				response.BodyPrefix = text;
 
-				response.SendAndSaveCopy();
+				foreach(string s in CCList)
+				{
+				response.CcRecipients.Add(s);
 
 			}
+			foreach (string s in receiversList)
+				{
+				response.ToRecipients.Add(s);
+
+			}
+
+			response.SendAndSaveCopy();
+
+		//	}
 			/*
              *       ResponseMessage response = item.CreateReply(false);
                  response.BodyPrefix = text;
