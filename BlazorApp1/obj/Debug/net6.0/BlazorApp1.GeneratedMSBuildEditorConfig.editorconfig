@@ -20,6 +20,10 @@ build_property._RazorSourceGeneratorDebug =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Janne/Documents/tehtavat2022/Syksy/Ticketing-System/BlazorApp1/Pages/CommentWindow.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29tbWVudFdpbmRvdy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Janne/Documents/tehtavat2022/Syksy/Ticketing-System/BlazorApp1/Pages/History.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSGlzdG9yeS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -50,6 +54,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Janne/Documents/tehtavat2022/Syksy/Ticketing-System/BlazorApp1/Pages/Register.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Janne/Documents/tehtavat2022/Syksy/Ticketing-System/BlazorApp1/Pages/SetStatusWindow.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2V0U3RhdHVzV2luZG93LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Janne/Documents/tehtavat2022/Syksy/Ticketing-System/BlazorApp1/Pages/Showmailsrazor.razor]

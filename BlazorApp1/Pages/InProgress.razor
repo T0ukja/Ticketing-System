@@ -53,6 +53,8 @@
 		</th>
 		<th style="    padding-left: 10px;">
 			<button class="btn btn-primary" @onclick="() => CheckData(message.message_id.ToString())">Check Info</button>
+					<button class="btn btn-primary" @onclick="() => SolveTicket(message.message_id.ToString(), message)">Mark</button>
+
 		</th>
 
 
@@ -77,21 +79,65 @@
 
 			}
 		}
+
 </table>
 </div>
+@if (ShowPopUp == false && showMarkStatus == true)
+{<div>
+	<div style="text-align:center; width:75%; height:300px; background-color:white;">
+		<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; float:left;" @onclick="()=> {showMarkStatus = false; StateHasChanged();}"><i class="fa fa-times fa-2x" aria-hidden="true"></i></button>
+		<button type="button" class="btn btn-outline-primary " style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = true; StateHasChanged();}"> Open Status</button>
+		<button type="button" class="btn btn-outline-primary" style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openCommentBox = true; StateHasChanged();}"> Open Comments</button>
+
+		<div style="width:35%; float:right">
+		
+			@if (openCommentBox && openStatusBox == false)
+			{
+				<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openCommentBox = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
+				<CommentWindow/>
+			}
+			@if (openStatusBox && openCommentBox == false)
+			{
+				<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
+				<SetStatusWindow/>
+			}
+			
+		</div>
+	
+	</div>
+	</div>
+}
 
 @code {
 
-	private bool dialogOpen = false;
+	/*<p style="text-align:center;">Set ticket status</p>
+	 * 
+			<BSInput InputType="InputType.Select" @bind-Value="_value">
+				<option value="null">Open this select menu</option>
+				<option value="1">One</option>
+				<option value="2">Two</option>
+				<option value="3">Three</option>
+			</BSInput>
 
-[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
-private ClaimsPrincipal? user;
-private List<Datamodel> historyListTickets;
+			<p style="text-align:center;">Write information about status</p>
+			<input @bind="solvebox" style="height:125px; width:325px;" />
+
+			<button type="button" class="btn btn-outline-primary" style=" margin-left:10px; margin-top:10px;;" @onclick="()=> SendMessage()">Set Status</button>*/
+	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
+	private ClaimsPrincipal? user;
+	private List<Datamodel> historyListTickets;
+	private string messageid { get; set; }
+	private string solvebox { get; set; }
+	private string ticketName { get; set; }
+	private bool dialogOpen = false;
+	private bool showMarkStatus = false;
+	private bool openCommentBox = false;
+	private bool openStatusBox = false;
 	private string emailId;
-		bool ShowPopUp = false;
+	bool ShowPopUp = false;
 
 	ConversationResponse emailChain;
-private async System.Threading.Tasks.Task CheckData(string id)
+	private async System.Threading.Tasks.Task CheckData(string id)
 	{
 		// Getting conversation of email to list.
 		emailChain = await Emailing.GetConversion(id);
@@ -105,27 +151,41 @@ private async System.Threading.Tasks.Task CheckData(string id)
 
 	//user.Identity.Name.ToString(),
 	protected override async System.Threading.Tasks.Task OnInitializedAsync(){
-			var state = await provider;
-            // This is the current logged in user
-            user = state.User;
-			historyListTickets = await Emailing.GetMessagesDBInProgressUserAsync(user.Identity.Name.ToString());
+		var state = await provider;
+		// This is the current logged in user
+		user = state.User;
+		historyListTickets = await Emailing.GetMessagesDBInProgressUserAsync(user.Identity.Name.ToString());
 
 
 	}
 
-	
-	void ResponseMail()
-	{
 
-	}
-	void SendMail()
+	void SolveTicket(string messageid, Datamodel message)
 	{
-		
+		showMarkStatus = true;
+		ticketName = message.subject;
+		messageid = message.message_id;
+	}
+
+	void SendMessage()
+	{
+		// Backend function to send message here
+		showMarkStatus = false;
 	}
 	void ClosePopup()
     {
 		// Changes value to false to shutdown dialog module
 		ShowPopUp = false;
+
+		// Changes website state without reload.
+		StateHasChanged();
+
+	}
+	void CloseMarkWindow()
+	{
+		// Changes value to false to shutdown dialog module
+		showMarkStatus = false;
+
 		// Changes website state without reload.
 		StateHasChanged();
 
