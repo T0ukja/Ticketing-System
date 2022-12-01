@@ -1,4 +1,19 @@
-﻿
+﻿@using System.Collections.ObjectModel;
+@using BlazorApp1.Authentication
+@using BlazorApp1.Data
+@using System.Timers;
+@using Microsoft.Exchange.WebServices.Data;
+@using BlazorApp1.Models;
+@using Microsoft.AspNetCore.Identity;
+@using System.Security.Claims
+@using MongoDB.Bson
+@inject Emails Emailing
+@inject NavigationManager navManager;
+@inject IJSRuntime JSRuntime
+@attribute [Authorize(Roles = "Administrator, HelpDesk")]
+@inject AuthenticationStateProvider authStateProvider;
+@inject AuthenticationStateProvider context;
+
 
 <div >
 
@@ -7,7 +22,7 @@
 	<p style="text-align:center;">Add Comment to Ticket moror</p>
 
 	<input @bind="commentbox" style="width:60%; height:50%; margin-left:45px;">
-	<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> SendMessage()"> <i class="fa fa-paper-plane fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
+	<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> SendMessage(commentbox)"> <i class="fa fa-paper-plane fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
 
 </div>
 		
@@ -18,10 +33,24 @@
 @code{
 	private string commentbox;
 
-	void SendMessage()
+
+	[Parameter]
+	public string messageid{ get; set; }
+
+	async void SendMessage(string message)
 	{
 		// Backend function to send message here
 
+		Emailing.SendComment(messageid, commentbox);
+
 	}
 
+
+	protected override async System.Threading.Tasks.Task OnInitializedAsync()
+
+	{
+		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
+																//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
+	
+	}
 }

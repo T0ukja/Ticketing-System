@@ -30,7 +30,14 @@ builder.Services.Configure<Settingsmodel>(
     builder.Configuration.GetSection("EmailDatabase"));
 builder.Services.Configure<Settingsmodel_login>(
     builder.Configuration.GetSection("LoginDatabase"));
+builder.Services.Configure<Settingsmodel_comments>(
+	builder.Configuration.GetSection("CommentDatabase"));
+builder.Services.Configure<Settingsmodel_solved>(
+	builder.Configuration.GetSection("HistoryDatabase"));
 builder.Services.AddSyncfusionBlazor();
+
+
+
 
 
 // Session storage

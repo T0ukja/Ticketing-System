@@ -9,6 +9,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Components.Authorization;
 using BlazorApp1.Authentication;
+using System.Security.Cryptography.Xml;
+using System.Xml.Linq;
+using static MongoDB.Driver.WriteConcern;
 
 namespace BlazorApp1.Data
 {
@@ -24,8 +27,13 @@ namespace BlazorApp1.Data
          * */
 		// Variable declares for MongoDB database.
 		private readonly IMongoCollection<Datamodel> emailCollection;
+		private readonly IMongoCollection<Comments> commentsCollection;
+		private readonly IMongoCollection<Datamodel> historyCollection;
+
 		private MongoClient mongoClient { get; set; }
 		private readonly IMongoDatabase mongoDatabase;
+		private readonly IMongoDatabase mongoDatabase_comments;
+		private readonly IMongoDatabase mongoDatabase_solved;
 		private readonly ILogger _logger;
 
 
@@ -40,7 +48,7 @@ namespace BlazorApp1.Data
 		private ExchangeService service;
 
 
-		public Emails(IOptions<Settingsmodel> settingsmodel, IMemoryCache memoryCache, ILogger<Login> logger)
+		public Emails(IOptions<Settingsmodel> settingsmodel,IOptions<Settingsmodel_comments> settingsmodel_comments, IOptions<Settingsmodel_solved> settingsmodel_solved, IMemoryCache memoryCache, ILogger<Login> logger)
 		{
 			_logger = logger;
 			MemoryCache = memoryCache;
@@ -49,11 +57,28 @@ namespace BlazorApp1.Data
 			mongoClient = new MongoClient(
 			settingsmodel.Value.ConnectionString);
 
+		
+
+			mongoDatabase_comments = mongoClient.GetDatabase(
+				settingsmodel_comments.Value.DatabaseName);
+
+			mongoDatabase_solved = mongoClient.GetDatabase(
+					settingsmodel_solved.Value.DatabaseName);
+
 			mongoDatabase = mongoClient.GetDatabase(
 				settingsmodel.Value.DatabaseName);
 
+
+	//*****************************************************
+
 			emailCollection = mongoDatabase.GetCollection<Datamodel>(
 				settingsmodel.Value.CollectionName);
+
+			commentsCollection = mongoDatabase_comments.GetCollection<Comments>(
+				settingsmodel_comments.Value.CollectionName);
+
+			historyCollection = mongoDatabase.GetCollection<Datamodel>(
+				settingsmodel_solved.Value.CollectionName);
 
 			// Emailmessage for sending messages
 
@@ -128,7 +153,22 @@ namespace BlazorApp1.Data
 
 
 		}
+		
+		public async Task<List<Comments>> GetComments(string messageid)
+		{
+			List<Comments> comments = commentsCollection.Find(x => x.message_id.Equals(messageid)).ToList();
+			return comments;
+		}
 
+		public async void SendComment(string messageid,string message)
+		{
+
+			Comments comments = new Comments();
+			comments.message_id = messageid;
+			comments.message = message;
+			commentsCollection.InsertOneAsync(comments);
+
+		}
 
 		public async Task<List<Datamodel>> GetMessagesDBInProgressUserAsync(string name)
 		{
@@ -186,10 +226,17 @@ namespace BlazorApp1.Data
 		{
 
 			//var filter = Builders<Datamodel>.Filter.Ne("handler", name);
-			List<Datamodel> ListHistory = emailCollection.Find(x => x.status.Equals("Done")).ToList();
+			List<Datamodel> ListHistory = historyCollection.Find(x => x.status.Equals("1")).ToList();
 			return ListHistory;
 
 
+		}
+
+		public async Task<Datamodel> GetTicketStatus(string messageid)
+		{
+			Datamodel email = new Datamodel();
+			email = emailCollection.Find(x => x.message_id.Equals(messageid)).FirstOrDefault();
+			return email;
 		}
 		public async Task<List<Datamodel>> GetMessagesDBInProgressAsync()
 		{
@@ -216,8 +263,8 @@ namespace BlazorApp1.Data
 			try
 			{
 
-				_logger.LogInformation("Emailing assing funktiossa");
-				var update = Builders<Datamodel>.Update.Set("handler", name);
+				var update = Builders<Datamodel>.Update.Set("handler", name).Set("status", "3");
+
 				var filter = Builders<Datamodel>.Filter.Eq("message_id", messageid);
 				Datamodel ticket = emailCollection.Find(x => x.message_id == messageid).FirstOrDefault();
 				var options = new UpdateOptions { IsUpsert = true };
@@ -230,7 +277,30 @@ namespace BlazorApp1.Data
 			}
 
 		}
+		public void SetTicketStatus(string _value, string solvetext, string messageid)
+		{
 
+			Datamodel ticket = emailCollection.Find(x => x.message_id == messageid).FirstOrDefault();
+			if (_value == "1")
+			{
+				ticket.status = _value;
+				ticket.solution = solvetext;
+				historyCollection.InsertOneAsync(ticket);
+				emailCollection.DeleteOne(x => x.message_id == messageid);
+			}
+			else
+			{
+				var update = Builders<Datamodel>.Update.Set("status", _value).Set("solution", solvetext);
+				var filter = Builders<Datamodel>.Filter.Eq("message_id", messageid);
+				var options = new UpdateOptions { IsUpsert = true };
+				emailCollection.UpdateOne(filter, update, options);
+			}
+
+
+
+			//emailCollection.InsertOneAsync(emailModel);
+
+		}
 		// Function used to get unreaded emails and insert them to database.
 		public void GetEmails()
 		{
@@ -271,7 +341,9 @@ namespace BlazorApp1.Data
 					emailModel.datetimecreated = message.DateTimeCreated.ToString();
 					emailModel.datetimereceived = message.DateTimeReceived.ToString();
 					emailModel.handler = "";
-					emailModel.status = "New";
+					emailModel.solution = "";
+
+					emailModel.status = "5";
 					// Sets email readed.
 					message.IsRead = true;
 
