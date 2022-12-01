@@ -53,7 +53,7 @@
 		</th>
 		<th style="    padding-left: 10px;">
 			<button class="btn btn-primary" @onclick="() => CheckData(message.message_id.ToString())">Check Info</button>
-					<button class="btn btn-primary" @onclick="() => SolveTicket(message.message_id.ToString(), message)">Mark</button>
+					<button class="btn btn-primary" @onclick="() => SolveTicket(message)">Mark</button>
 
 		</th>
 
@@ -84,22 +84,33 @@
 </div>
 @if (ShowPopUp == false && showMarkStatus == true)
 {<div>
+
 	<div style="text-align:center; width:75%; height:300px; background-color:white;">
 		<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; float:left;" @onclick="()=> {showMarkStatus = false; StateHasChanged();}"><i class="fa fa-times fa-2x" aria-hidden="true"></i></button>
 		<button type="button" class="btn btn-outline-primary " style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = true; StateHasChanged();}"> Open Status</button>
 		<button type="button" class="btn btn-outline-primary" style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openCommentBox = true; StateHasChanged();}"> Open Comments</button>
+			
 
-		<div style="width:35%; float:right">
+			@if(messageid != null && Comments.Count() != 0)
+			{
+				<p>Loopataan</p>
+				@foreach(Comments comma in Comments)
+				{
+					<p>@comma.message</p>
+				}
+			}
+			<div style="width:35%; float:right">
 		
 			@if (openCommentBox && openStatusBox == false)
 			{
 				<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openCommentBox = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
-				<CommentWindow/>
+
+				<CommentWindow messageid="@messageid"/>
 			}
 			@if (openStatusBox && openCommentBox == false)
 			{
 				<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
-				<SetStatusWindow/>
+				<SetStatusWindow messageid="@messageid"/>
 			}
 			
 		</div>
@@ -127,6 +138,7 @@
 	private ClaimsPrincipal? user;
 	private List<Datamodel> historyListTickets;
 	private string messageid { get; set; }
+	
 	private string solvebox { get; set; }
 	private string ticketName { get; set; }
 	private bool dialogOpen = false;
@@ -135,6 +147,7 @@
 	private bool openStatusBox = false;
 	private string emailId;
 	bool ShowPopUp = false;
+	private List<Comments> Comments;
 
 	ConversationResponse emailChain;
 	private async System.Threading.Tasks.Task CheckData(string id)
@@ -160,11 +173,13 @@
 	}
 
 
-	void SolveTicket(string messageid, Datamodel message)
+	private async System.Threading.Tasks.Task SolveTicket(Datamodel message)
 	{
 		showMarkStatus = true;
 		ticketName = message.subject;
 		messageid = message.message_id;
+		Comments = await Emailing.GetComments(messageid);
+
 	}
 
 	void SendMessage()

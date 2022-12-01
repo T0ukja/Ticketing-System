@@ -17,7 +17,9 @@ namespace BlazorApp1.Models
     public string datetimecreated { get; set; }
     public string datetimereceived { get; set; }
     public string handler { get; set; }
-    public string status { get; set; }
+	public string solution { get; set; }
+
+	public string status { get; set; }
 
     }
 }

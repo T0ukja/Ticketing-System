@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Pages\StatusWindow.razor" />
+    <None Include="Shared\StatusWindow.razor" />
     <None Include="wwwroot\css\StyleSheet.css" />
   </ItemGroup>
 
