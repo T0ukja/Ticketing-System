@@ -26,6 +26,13 @@ tr[ticketobject] {
 i[aa] {
 margin-left:10px;
 }
+
+div[columns] {
+    width: 50%;
+    float: left;
+    padding: 20px;
+    border: 2px solid red;
+}
 tr[subjects] {
     text-align: center;
     font-family: 'Arial Rounded MT';
@@ -46,6 +53,7 @@ table[tickettable] {
     
     table-layout: fixed;
     overflow: auto;
+    margin-bottom: 40px;
 }
 div[dialogbox] {
     display: block;

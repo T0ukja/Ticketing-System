@@ -160,12 +160,14 @@ namespace BlazorApp1.Data
 			return comments;
 		}
 
-		public async void SendComment(string messageid,string message)
+		public async void SendComment(string messageid,string message, string sender)
 		{
 
 			Comments comments = new Comments();
 			comments.message_id = messageid;
 			comments.message = message;
+			comments.time = DateTime.Now;
+			comments.sender = sender;
 			commentsCollection.InsertOneAsync(comments);
 
 		}

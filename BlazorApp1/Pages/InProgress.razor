@@ -24,7 +24,7 @@
 
 
    		<div style="height: 300px;
-    overflow: hidden; overflow-y: scroll; width:55vw; ">
+    overflow: hidden; overflow-y: scroll; width:60vw; margin-bottom:40px;">
 <table tickettable>
 	 <tr ticketobject>
     <th>Subject</th>
@@ -83,39 +83,74 @@
 </table>
 </div>
 @if (ShowPopUp == false && showMarkStatus == true)
-{<div>
-
-	<div style="text-align:center; width:75%; height:300px; background-color:white;">
+{
+	<div style="background-color:white; width: 60vw;  display: flex;">
 		<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; float:left;" @onclick="()=> {showMarkStatus = false; StateHasChanged();}"><i class="fa fa-times fa-2x" aria-hidden="true"></i></button>
-		<button type="button" class="btn btn-outline-primary " style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = true; StateHasChanged();}"> Open Status</button>
-		<button type="button" class="btn btn-outline-primary" style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openCommentBox = true; StateHasChanged();}"> Open Comments</button>
-			
 
+		<div style="width:65%; margin-left:20px; margin-top:40px; height:430px; overflow: auto;">
+		
+			<table style="width:100%;">
+
+		
 			@if(messageid != null && Comments.Count() != 0)
 			{
-				<p>Loopataan</p>
+			
 				@foreach(Comments comma in Comments)
 				{
-					<p>@comma.message</p>
+						<tr style=" background-color:lightblue; font-size:15px; padding-top:15px; border-radius: 25px; width:50%;">
+							<p><span style="font-weight:bold;"> From :</span>
+							@comma.sender</p>
+
+							<p style="
+  padding: 10px;
+  border: 3px solid black;
+  margin: 0;
+background-color:white;
+margin-left:10px;
+margin-right:10px;
+align-content:center;
+margin-bottom:10px;
+padding-left:25px;
+  border-radius: 25px;
+">@comma.message</p>
+						
+					</tr>
+					<br/>
 				}
 			}
-			<div style="width:35%; float:right">
-		
+				</table>
+	
+	</div>
+		<div style="width:35%; flex-direction: column;  display: flex;align-items: flex-start; padding-left:10px;">
+			<div style="padding-left:20px;">
+				<button type="button" class="btn btn-outline-primary " style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = true; openCommentBox = false; StateHasChanged();}"> Open Status</button>
+				<button type="button" class="btn btn-outline-primary" style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openCommentBox = true;  openStatusBox = false; StateHasChanged();}"> Open Comments</button>
+
+			</div>
+		<br>
 			@if (openCommentBox && openStatusBox == false)
 			{
+				<div >
 				<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openCommentBox = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
 
-				<CommentWindow messageid="@messageid"/>
+				</div>
+				<div>
+					<CommentWindow messageid="@messageid"/>
+
+					</div>
 			}
 			@if (openStatusBox && openCommentBox == false)
 			{
-				<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
-				<SetStatusWindow messageid="@messageid"/>
+				<div>
+					<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
+
+					</div>
+			<div>
+				<SetStatusWindow messageid="@messageid" />
+			</div>
 			}
-			
+
 		</div>
-	
-	</div>
 	</div>
 }
 
