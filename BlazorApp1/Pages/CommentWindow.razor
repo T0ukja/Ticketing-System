@@ -17,13 +17,14 @@
 
 <div >
 
+	<span>
 
+	<p style="text-align:center;">Add Comment to Ticket</p>
+		<textarea @bind="commentbox" cols="40" rows="5"></textarea>
 
-	<p style="text-align:center;">Add Comment to Ticket moror</p>
-
-	<input @bind="commentbox" style="width:60%; height:50%; margin-left:45px;">
-	<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> SendMessage(commentbox)"> <i class="fa fa-paper-plane fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
-
+	<br/>
+	<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; float:right; margin-top:10px;" @onclick="()=> SendMessage(commentbox)"> <i class="fa fa-paper-plane fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
+	</span>
 </div>
 		
 
@@ -33,6 +34,8 @@
 @code{
 	private string commentbox;
 
+	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
+	private ClaimsPrincipal? user;
 
 	[Parameter]
 	public string messageid{ get; set; }
@@ -41,7 +44,7 @@
 	{
 		// Backend function to send message here
 
-		Emailing.SendComment(messageid, commentbox);
+		Emailing.SendComment(messageid, commentbox, user.Identity.Name);
 
 	}
 
@@ -49,6 +52,10 @@
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 
 	{
+
+		var state = await provider;
+		// This is the current logged in user
+		user = state.User;
 		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
 																//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
 	

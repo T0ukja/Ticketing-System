@@ -24,7 +24,7 @@
 
 
    		<div style="height: 300px;
-    overflow: hidden; overflow-y: scroll; width:55vw; ">
+    overflow: hidden; overflow-y: scroll; width:60vw; margin-bottom:40px;">
 <table tickettable>
 	 <tr ticketobject>
     <th>Subject</th>
@@ -84,12 +84,12 @@
 </div>
 @if (ShowPopUp == false && showMarkStatus == true)
 {
-	<div style="background-color:white; width:1100px;  display: flex;">
+	<div style="background-color:white; width: 60vw;  display: flex;">
 		<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; float:left;" @onclick="()=> {showMarkStatus = false; StateHasChanged();}"><i class="fa fa-times fa-2x" aria-hidden="true"></i></button>
 
-		<div style="width:65%; margin-left:20px; margin-top:40px; height:100px; overflow: auto;">
+		<div style="width:65%; margin-left:20px; margin-top:40px; height:430px; overflow: auto;">
 		
-			<table>
+			<table style="width:100%;">
 
 		
 			@if(messageid != null && Comments.Count() != 0)
@@ -97,18 +97,34 @@
 			
 				@foreach(Comments comma in Comments)
 				{
-					<tr>
-						@comma.message
+						<tr style=" background-color:lightblue; font-size:15px; padding-top:15px; border-radius: 25px; width:50%;">
+							<p><span style="font-weight:bold;"> From :</span>
+							@comma.sender</p>
+
+							<p style="
+  padding: 10px;
+  border: 3px solid black;
+  margin: 0;
+background-color:white;
+margin-left:10px;
+margin-right:10px;
+align-content:center;
+margin-bottom:10px;
+padding-left:25px;
+  border-radius: 25px;
+">@comma.message</p>
+						
 					</tr>
+					<br/>
 				}
 			}
 				</table>
 	
 	</div>
-		<div style="width:35%; flex-direction: column;  display: flex;align-items: flex-start; border: solid 3px;">
-			<div>
-				<button type="button" class="btn btn-outline-primary " style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = true; StateHasChanged();}"> Open Status</button>
-				<button type="button" class="btn btn-outline-primary" style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openCommentBox = true; StateHasChanged();}"> Open Comments</button>
+		<div style="width:35%; flex-direction: column;  display: flex;align-items: flex-start; padding-left:10px;">
+			<div style="padding-left:20px;">
+				<button type="button" class="btn btn-outline-primary " style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = true; openCommentBox = false; StateHasChanged();}"> Open Status</button>
+				<button type="button" class="btn btn-outline-primary" style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openCommentBox = true;  openStatusBox = false; StateHasChanged();}"> Open Comments</button>
 
 			</div>
 		<br>
@@ -119,7 +135,7 @@
 
 				</div>
 				<div>
-					<CommentWindow messageid="@messageid" />
+					<CommentWindow messageid="@messageid"/>
 
 					</div>
 			}

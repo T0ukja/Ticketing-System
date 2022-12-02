@@ -53,6 +53,7 @@ table[tickettable] {
     
     table-layout: fixed;
     overflow: auto;
+    margin-bottom: 40px;
 }
 div[dialogbox] {
     display: block;
