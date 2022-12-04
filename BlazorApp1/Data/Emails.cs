@@ -12,6 +12,9 @@ using BlazorApp1.Authentication;
 using System.Security.Cryptography.Xml;
 using System.Xml.Linq;
 using static MongoDB.Driver.WriteConcern;
+using System.Runtime.CompilerServices;
+using Blazorise;
+using Microsoft.VisualBasic;
 
 namespace BlazorApp1.Data
 {
@@ -28,14 +31,15 @@ namespace BlazorApp1.Data
 		// Variable declares for MongoDB database.
 		private readonly IMongoCollection<Datamodel> emailCollection;
 		private readonly IMongoCollection<Comments> commentsCollection;
+		private readonly IMongoCollection<NewEmails> newEmailsCollection;
 		private readonly IMongoCollection<Datamodel> historyCollection;
 
 		private MongoClient mongoClient { get; set; }
 		private readonly IMongoDatabase mongoDatabase;
 		private readonly IMongoDatabase mongoDatabase_comments;
+		private readonly IMongoDatabase mongoDatabase_newemails;
 		private readonly IMongoDatabase mongoDatabase_solved;
 		private readonly ILogger _logger;
-
 
 		// Variables for setting credentials from txt file.
 		private string[] credentials;
@@ -48,7 +52,7 @@ namespace BlazorApp1.Data
 		private ExchangeService service;
 
 
-		public Emails(IOptions<Settingsmodel> settingsmodel,IOptions<Settingsmodel_comments> settingsmodel_comments, IOptions<Settingsmodel_solved> settingsmodel_solved, IMemoryCache memoryCache, ILogger<Login> logger)
+		public Emails(IOptions<Settingsmodel> settingsmodel,IOptions<Settingsmodel_comments> settingsmodel_comments,IOptions<Settingsmodel_newemails> settingsmodel_newemails , IOptions<Settingsmodel_solved> settingsmodel_solved, IMemoryCache memoryCache, ILogger<Login> logger)
 		{
 			_logger = logger;
 			MemoryCache = memoryCache;
@@ -57,7 +61,9 @@ namespace BlazorApp1.Data
 			mongoClient = new MongoClient(
 			settingsmodel.Value.ConnectionString);
 
-		
+
+			mongoDatabase_newemails = mongoClient.GetDatabase(
+				settingsmodel_newemails.Value.DatabaseName);
 
 			mongoDatabase_comments = mongoClient.GetDatabase(
 				settingsmodel_comments.Value.DatabaseName);
@@ -76,6 +82,9 @@ namespace BlazorApp1.Data
 
 			commentsCollection = mongoDatabase_comments.GetCollection<Comments>(
 				settingsmodel_comments.Value.CollectionName);
+
+			newEmailsCollection = mongoDatabase.GetCollection<NewEmails>(
+			settingsmodel_newemails.Value.CollectionName);
 
 			historyCollection = mongoDatabase.GetCollection<Datamodel>(
 				settingsmodel_solved.Value.CollectionName);
@@ -96,8 +105,27 @@ namespace BlazorApp1.Data
 			service.Url = new Uri(emailurl);
 			System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
 		}
+		public async void DeleteUnreadedMails(string messageconversationid)
+		{
 
 
+			if ((newEmailsCollection.CountDocuments(x => x.EmailConversationId == messageconversationid)) > 1)
+			{
+				await newEmailsCollection.DeleteManyAsync(Builders<NewEmails>.Filter.Lt("EmailConversationId", messageconversationid));
+
+			}
+			else
+			{
+				newEmailsCollection.DeleteOne(x => x.EmailConversationId == messageconversationid);
+
+			}
+
+		}
+		public async Task<List<NewEmails>> GetUnreadedMails()
+		{
+
+			return newEmailsCollection.Find(_ => true).ToList();
+		}
 
 		public async Task<ConversationResponse> GetConversion(string messageId)
 		{
@@ -181,6 +209,53 @@ namespace BlazorApp1.Data
 
 
 		}
+
+
+
+
+
+
+
+
+
+
+		public async void SendForwardEmail(ItemId id, string text, List<string> receiversList, List<string> CCList)
+		{
+			FindItemsResults<Item> findResults;
+			service.Url = new Uri(emailurl);
+			int offSet = 0;
+			// How many to get at function call (loads this many messages at one time).
+			int pageSize = 20;
+	
+			PropertySet propSet = new PropertySet(BasePropertySet.IdOnly, ItemSchema.LastModifiedTime);
+			EmailMessage message = EmailMessage.Bind(service, id, propSet);
+
+			ResponseMessage response = message.CreateForward();
+			response.BodyPrefix = text;
+
+			foreach (string s in CCList)
+			{
+				response.CcRecipients.Add(s);
+
+			}
+			foreach (string s in receiversList)
+			{
+				response.ToRecipients.Add(s);
+
+			}
+
+			response.SendAndSaveCopy();
+
+		}
+
+
+
+
+
+//********************************************************************************************************
+
+
+
 		public async void SendMail(ItemId id, string text, List<string> receiversList, List<string> CCList)
 		{
 			_logger.LogInformation("Sendmail funktiossa");
@@ -190,13 +265,7 @@ namespace BlazorApp1.Data
 			int offSet = 0;
 			// How many to get at function call (loads this many messages at one time).
 			int pageSize = 20;
-			//ExtendedPropertyDefinition PidTagInternetMessageId = new ExtendedPropertyDefinition(4149, MapiPropertyType.ObjectId);
-			// finds results from email folder (this is set to Inbox).
-			//	SearchFilter sf = new SearchFilter.IsEqualTo(EmailMessageSchema.Id, id);
-			//	ItemView view = new ItemView(pageSize, offSet, OffsetBasePoint.Beginning);
-			//	findResults = service.FindItems(WellKnownFolderName.Inbox, sf, view);
-			//	foreach (EmailMessage item in findResults.Items)
-			//	{
+			
 			PropertySet propSet = new PropertySet(BasePropertySet.IdOnly, ItemSchema.LastModifiedTime);
 			EmailMessage message = EmailMessage.Bind(service, id, propSet);
 
@@ -309,8 +378,8 @@ namespace BlazorApp1.Data
 			EmailMessage helpdeskemail = new EmailMessage(service);
 
 
-			// Variable declaration.
-			FindItemsResults<Item> findResults;
+		// Variable declaration.
+		FindItemsResults<Item> findResults;
 			// offSet
 			int offSet = 0;
 			// How many to get at function call (loads this many messages at one time).
@@ -325,6 +394,8 @@ namespace BlazorApp1.Data
 			// Lists emails to list.
 			//   List<Datamodel> emailModel = new List<Datamodel>();
 			Datamodel emailModel = new Datamodel();
+			NewEmails moro = new NewEmails();
+
 			// Session variable for mongoclient.
 			var session = mongoClient.StartSession();
 			// Bool value to prevent error if there arent't emails then no need to update.
@@ -344,6 +415,7 @@ namespace BlazorApp1.Data
 					emailModel.datetimereceived = message.DateTimeReceived.ToString();
 					emailModel.handler = "";
 					emailModel.solution = "";
+					emailModel.conversationid = message.ConversationId;
 
 					emailModel.status = "5";
 					// Sets email readed.
@@ -396,12 +468,29 @@ namespace BlazorApp1.Data
 
 
 				}
-				else
+				if ((message.IsRead == false) && (message.InReplyTo != null)) //if the current message is unread
 				{
-					// If email is readed but it's useless at moment.
-				}
-			}
+					message.Load();
+					message.IsRead = true;
+					
+					if ( (newEmailsCollection.CountDocuments(x=>x.EmailConversationId == message.ConversationId))>= 1)
+					{
 
+					}
+					else
+					{
+						moro.EmailConversationId = message.ConversationId.ToString();
+
+						newEmailsCollection.InsertOneAsync(moro);
+					}
+
+					message.Update(ConflictResolutionMode.AlwaysOverwrite);
+
+				}
+
+
+
+			}
 
 
 		}

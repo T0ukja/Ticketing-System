@@ -34,6 +34,8 @@ builder.Services.Configure<Settingsmodel_comments>(
 	builder.Configuration.GetSection("CommentDatabase"));
 builder.Services.Configure<Settingsmodel_solved>(
 	builder.Configuration.GetSection("HistoryDatabase"));
+builder.Services.Configure<Settingsmodel_newemails>(
+	builder.Configuration.GetSection("NewEmailsDatabase"));
 builder.Services.AddSyncfusionBlazor();
 
 

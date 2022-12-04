@@ -24,14 +24,14 @@
 
 <div style="height: 300px; width: 650px;
     overflow: auto; ">
+	
 	<table>
 		<tr>
 			<th>Subject</th>
 			<th>From</th>
 			<th>Time</th>
-			<th></th>
+			<th>Unreaded mails</th>
 		</tr>
-
 
 		@foreach (Datamodel message in mongoDbList)
 		{
@@ -45,10 +45,20 @@
 				<th>
 					@message.datetimereceived
 				</th>
+				
+				<th>
+					@if (unreadedMails.Exists(a=>a.EmailConversationId == message.conversationid))
+					{
+					<th>
+						!!!
+						</th>
+	}
+					
+				</th>
 
 				<th style="    padding-left: 5px;">
-					<button class="btn btn-primary" @onclick="() => CheckData(message.message_id.ToString())">Info</button>
-					<button class="btn btn-primary" @onclick="() => AssingTickett(user.Identity.Name.ToString(), message.message_id)">Assing</button>
+					<button class="btn btn-primary" @onclick="() => CheckData(message.message_id.ToString(), message.conversationid)">Info</button>
+					<button class="btn btn-primary" @onclick="() => AssingTicket(user.Identity.Name.ToString(), message.message_id)">Assing</button>
 				</th>
 
 
@@ -65,6 +75,8 @@
 							<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> ClosePopup()"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
 
 							<Popupmodal message="message" emailChain="emailChain"/>
+
+							
 							
 						</div>
 					</div>
@@ -87,7 +99,7 @@
 	bool isPressed = false;
 	private List<string> receiverList;
 	private List<string> CCList;
-
+	private bool isEmpty;
 	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
 	private ClaimsPrincipal? user;
 	private ItemId messageid;
@@ -100,7 +112,9 @@
 	private List<Datamodel> mongoDbList;
 	//private List<Datamodel> mongoDBListJobsInProgress;
 	private string type;
+	private List<string> replymessagecount;
 	private List<Datamodel> mongoDbListinProgress;
+	private List<NewEmails> unreadedMails;
 	// Used to loop email conversation messages.
 	// Timer which is assigned 15 seconds (Updates every 5 seconds).
 	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(10));
@@ -110,7 +124,7 @@
 	ConversationResponse emailChain;
 
 	// This function is called when pressing more information about ticket.
-	private async System.Threading.Tasks.Task CheckData(string id)
+	private async System.Threading.Tasks.Task CheckData(string id, string messageconv)
 	{
 		// Getting conversation of email to list.
 		emailChain = await Emailing.GetConversion(id);
@@ -118,9 +132,10 @@
 		emailId = id;
 		// This opens dialog when true.
 		ShowPopUp = true;
+		Emailing.DeleteUnreadedMails(messageconv);
 
 	}
-	private async System.Threading.Tasks.Task AssingTickett(string name, string id)
+	private async System.Threading.Tasks.Task AssingTicket(string name, string id)
 	{
 
 
@@ -203,6 +218,9 @@
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
 
+
+
+
 		var state = await provider;
 		// This is the current logged in user
 		user = state.User;
@@ -211,6 +229,7 @@
 		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
 		mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
 																//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
+		unreadedMails = await Emailing.GetUnreadedMails();
 		RunTimer();
 	}
 	void loopdata(EmailMessage messageitem)
@@ -300,8 +319,9 @@
 		{
 			// Do check to verify that there is new email
 			// Get new emails and updates list.
-			Emailing.GetEmails();
 			mongoDbList = await Emailing.GetMessagesDbAsync();
+			//replymessagecount = Emailing.GetEmails();
+			unreadedMails = await Emailing.GetUnreadedMails();
 
 			StateHasChanged();
 
