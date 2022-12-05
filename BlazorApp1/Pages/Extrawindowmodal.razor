@@ -1,0 +1,120 @@
+﻿@using System.Collections.ObjectModel;
+@using BlazorApp1.Authentication
+@using BlazorApp1.Data
+@using System.Timers;
+@using Microsoft.Exchange.WebServices.Data;
+@using BlazorApp1.Models;
+@using Microsoft.AspNetCore.Identity;
+@using System.Security.Claims
+@using MongoDB.Bson
+@inject Emails Emailing
+@inject NavigationManager navManager;
+@inject IJSRuntime JSRuntime
+@attribute [Authorize(Roles = "Administrator, HelpDesk")]
+@inject AuthenticationStateProvider authStateProvider;
+@inject AuthenticationStateProvider context;
+
+<div style="width:65%; margin-left:20px; margin-top:40px; height:430px; overflow: auto;">
+
+	<table style="width:100%;">
+
+		@if (messageid != null && Comments.Count() != 0)
+		{
+
+			@foreach (Comments comma in Comments)
+			{
+				<tr style=" background-color:lightblue; font-size:15px; padding-top:15px; border-radius: 25px; width:50%;">
+					<p>
+						<span style="font-weight:bold;"> From :</span>
+						@comma.sender
+					</p>
+
+					<p style="
+  padding: 10px;
+  border: 3px solid black;
+  margin: 0;
+background-color:white;
+margin-left:10px;
+margin-right:10px;
+align-content:center;
+margin-bottom:10px;
+padding-left:25px;
+  border-radius: 25px;
+">@comma.message</p>
+
+				</tr>
+				<br />
+			}
+		}
+	</table>
+
+</div>
+<div style="width:35%; flex-direction: column;  display: flex;align-items: flex-start; padding-left:10px;">
+	<div style="padding-left:20px;">
+		<button type="button" class="btn btn-outline-primary " style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = true; openCommentBox = false; StateHasChanged();}"> Open Status</button>
+		<button type="button" class="btn btn-outline-primary" style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openCommentBox = true;  openStatusBox = false; StateHasChanged();}"> Open Comments</button>
+
+	</div>
+	<br>
+	@if (openCommentBox && openStatusBox == false)
+	{
+		<div>
+			<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openCommentBox = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
+
+		</div>
+		<div>
+			<CommentWindow messageid=@messageid />
+
+		</div>
+	}
+	@if (openStatusBox && openCommentBox == false)
+	{
+		<div>
+			<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
+
+		</div>
+		<div>
+			<SetStatusWindow messageid=@messageid />
+		</div>
+	}
+
+</div>
+@code {
+	[Parameter]
+	public string messageid { get; set; }
+
+	[Parameter]
+	public List<Comments> Comments { get; set; }
+
+	private bool openCommentBox = false;
+	private bool openStatusBox = false;
+	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(10));
+
+
+	protected override async System.Threading.Tasks.Task OnInitializedAsync()
+	{
+		RunTimer();
+
+	}
+	async void RunTimer()
+	{
+		// Timer function.
+		while (await periodicTimer.WaitForNextTickAsync())
+		{
+			// Do check to verify that there is new email
+			// Get new emails and updates list.
+			Comments = await Emailing.GetComments(messageid);
+
+			StateHasChanged();
+
+
+
+		}
+	}
+
+}
+
+
+
+
+
