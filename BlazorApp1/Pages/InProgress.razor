@@ -49,11 +49,11 @@
 		</th>
 		
 				<th>
-			@message.handler
+			@message.message_id
 		</th>
 		<th style="    padding-left: 10px;">
 			<button class="btn btn-primary" @onclick="() => CheckData(message.message_id.ToString())">Check Info</button>
-					<button class="btn btn-primary" @onclick="() => SolveTicket(message)">Mark</button>
+				<button class="btn btn-primary" @onclick="() => SolveTicket(message)">Mark</button>
 
 		</th>
 
@@ -87,70 +87,7 @@
 	<div style="background-color:white; width: 60vw;  display: flex;">
 		<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; float:left;" @onclick="()=> {showMarkStatus = false; StateHasChanged();}"><i class="fa fa-times fa-2x" aria-hidden="true"></i></button>
 
-		<div style="width:65%; margin-left:20px; margin-top:40px; height:430px; overflow: auto;">
-		
-			<table style="width:100%;">
-
-		
-			@if(messageid != null && Comments.Count() != 0)
-			{
-			
-				@foreach(Comments comma in Comments)
-				{
-						<tr style=" background-color:lightblue; font-size:15px; padding-top:15px; border-radius: 25px; width:50%;">
-							<p><span style="font-weight:bold;"> From :</span>
-							@comma.sender</p>
-
-							<p style="
-  padding: 10px;
-  border: 3px solid black;
-  margin: 0;
-background-color:white;
-margin-left:10px;
-margin-right:10px;
-align-content:center;
-margin-bottom:10px;
-padding-left:25px;
-  border-radius: 25px;
-">@comma.message</p>
-						
-					</tr>
-					<br/>
-				}
-			}
-				</table>
-	
-	</div>
-		<div style="width:35%; flex-direction: column;  display: flex;align-items: flex-start; padding-left:10px;">
-			<div style="padding-left:20px;">
-				<button type="button" class="btn btn-outline-primary " style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = true; openCommentBox = false; StateHasChanged();}"> Open Status</button>
-				<button type="button" class="btn btn-outline-primary" style="width: 125px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openCommentBox = true;  openStatusBox = false; StateHasChanged();}"> Open Comments</button>
-
-			</div>
-		<br>
-			@if (openCommentBox && openStatusBox == false)
-			{
-				<div >
-				<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openCommentBox = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
-
-				</div>
-				<div>
-					<CommentWindow messageid="@messageid"/>
-
-					</div>
-			}
-			@if (openStatusBox && openCommentBox == false)
-			{
-				<div>
-					<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px; float:left;" @onclick="()=> {openStatusBox = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
-
-					</div>
-			<div>
-				<SetStatusWindow messageid="@messageid" />
-			</div>
-			}
-
-		</div>
+		<Extrawindowmodal Comments="Comments" messageid="@messageid"/>
 	</div>
 }
 
@@ -172,18 +109,18 @@ padding-left:25px;
 	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
 	private ClaimsPrincipal? user;
 	private List<Datamodel> historyListTickets;
-	private string messageid { get; set; }
 	
 	private string solvebox { get; set; }
-	private string ticketName { get; set; }
+
 	private bool dialogOpen = false;
 	private bool showMarkStatus = false;
-	private bool openCommentBox = false;
-	private bool openStatusBox = false;
+
 	private string emailId;
 	bool ShowPopUp = false;
-	private List<Comments> Comments;
+	private string messageid { get; set; }
 
+	private List<Comments> Comments;
+	private string ticketName { get; set; }
 	ConversationResponse emailChain;
 	private async System.Threading.Tasks.Task CheckData(string id)
 	{
