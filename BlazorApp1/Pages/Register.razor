@@ -1,6 +1,7 @@
 ﻿@page "/register"
-
+@using BlazorApp1.Models
 @using BlazorApp1.Data
+@using MongoDB.Bson;
 @attribute [Authorize(Roles = "Administrator")]
 @inject IJSRuntime JSRuntime
 @inject Login login
@@ -39,12 +40,160 @@
 </div>
 
 
+
+
+
+
+<div style="width:60%;">
+
+<table style="width:100%;">
+
+
+
+
+    @foreach (LoginModel user in currentUsers)
+        {
+            <tr style=" font-size:15px; padding-top:15px; border-radius: 25px; width:50%;">
+            
+
+                <p style="
+  padding: 10px;
+  border: 3px solid black;
+  margin: 0;
+background-color:white;
+margin-left:10px;
+margin-right:10px;
+align-content:center;
+margin-bottom:10px;
+padding-left:25px;
+  border-radius: 25px;
+"><span style="font-weight:bold;"> UserName:</span>@user.username <br />
+                    <span style="font-weight:bold;"> Role:</span>
+                    @user.Role
+                  
+                		<button class="btn btn-primary" @onclick="() => {passwordButtonPressed = true; deleteButtonPressed = false; currentUser=user;}">Set password</button>
+                    <button class="btn btn-primary" @onclick="() => {deleteButtonPressed = true; passwordButtonPressed = false; currentUser=user;}">Delete User</button>
+                
+                </p> 
+        
+
+            </tr>
+            <br />
+        
+    }
+</table>
+
+</div>
+
+@if(passwordButtonPressed == true & deleteButtonPressed == false)
+{
+   
+        <div class="modal" tabindex="-1" dialogbox role="dialog" style="margin-top:50px;">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+
+                <button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> {passwordButtonPressed = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
+                <div class="modal-header" style="align-self:center; margin-top:-20px;">
+                    <h1>
+                       Set new password for @currentUser.username
+                    </h1>
+                </div>
+                <div class="modal-body" id="listitems">
+
+                    <textarea @bind="passbox" cols="40" rows="1"></textarea>
+
+                 <button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> {passwordButtonPressed = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
+
+                    <button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> {ResetPassword(passbox, currentUser.id);}"> <i class="fa fa-paper-plane fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
+
+
+                    </div>
+                   
+
+
+
+                </div>
+            </div>
+        </div>
+
+
+   
+
+}
+@if (deleteButtonPressed == true & passwordButtonPressed == false)
+{
+   
+        <div class="modal" tabindex="-1" dialogbox role="dialog" style="margin-top:50px;">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+
+                    <button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> {deleteButtonPressed = false; StateHasChanged();}"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
+
+                <div class="modal-header" style="align-self:center; margin-top:-20px;">
+                    <h1>
+                        Are you sure to delete @currentUser.username User?
+                    </h1>
+                </div>
+                <div class="modal-body" id="listitems">
+                </div>
+
+                <button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> {deleteButtonPressed = false; StateHasChanged();}"> No</button>
+                <button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> {DeleteUser(currentUser.id);}"> Yes</button>
+
+            </div>
+
+
+
+                </div>
+            </div>
+      
+   
+
+}
+
+
+
+<div>
+
+
+
+</div>
  
             <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="Submit" />  
 @code {
-
+    private string? passbox { get; set; }
+    private string? registeru { get; set; }
+    private string? registerp { get; set; }
     private string selecterRole;
+    private LoginModel currentUser;
+    private List<LoginModel> currentUsers { get; set; }
+    private bool passwordButtonPressed = false;
+    private bool deleteButtonPressed = false;
 
+    protected override async Task OnInitializedAsync()
+    {
+        currentUsers = await login.UserList();
+    }
+
+
+
+
+    private void ResetPassword(string passwordtext, ObjectId id)
+    {
+        passwordButtonPressed = false;
+        StateHasChanged();
+
+        login.SetNewPassword(passwordtext, id);
+    }
+
+    private void DeleteUser(ObjectId id)
+    {
+
+        deleteButtonPressed = false;
+        StateHasChanged();
+        login.DeleteUser(id);
+
+    }
     private async Task CreateUser(string registeru, string registerp, string type) {
         if(selecterRole == null || registeru == "" || registerp == "")
         {
@@ -58,30 +207,6 @@
         }
 
     }
-	    private string? registeru { get; set; }
-    private string? registerp { get; set; }
 
-    /*
-     *     <form id="form1" runat="server">  
-        <p>Select role</p>  
-        <div>  
-         <Dropdown>
-    <DropdownToggle Color="Color.Primary">
-        Dropdown
-    </DropdownToggle>
-    <DropdownMenu>
-        <DropdownItem>Action</DropdownItem>
-        <DropdownDivider />
-        <DropdownItem>Another Action</DropdownItem>
-    </DropdownMenu>
-</Dropdown>
-    
-        </div>  
-        <br />  
-        <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="Submit" />  
-        <br />  
-        <br />  
-        <asp:Label ID="Label1" runat="server" EnableViewState="False"></asp:Label>  
-    </form> 
-     */
+ 
 }

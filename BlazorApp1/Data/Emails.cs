@@ -46,6 +46,10 @@ namespace BlazorApp1.Data
 		private string emailAddress;
 		private string password;
 		private string emailurl;
+
+
+		PeriodicTimer periodicTimer = new(TimeSpan.FromHours(2));
+
 		public IMemoryCache MemoryCache { get; }
 
 		// Needed for Microsoft EWS.
@@ -104,6 +108,64 @@ namespace BlazorApp1.Data
 			service.TraceFlags = TraceFlags.All;
 			service.Url = new Uri(emailurl);
 			System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+
+
+			RunTimer();
+
+		}
+
+		async void RunTimer()
+		{
+			// Timer function.
+			while (await periodicTimer.WaitForNextTickAsync())
+			{
+				// Do check to verify that there is new email
+				// Get new emails and updates list.
+				UpdateColorStatus();
+
+
+
+			}
+		}
+
+		public async void UpdateColorStatus()
+		{
+			List<Datamodel> listofemails = new List<Datamodel>();
+			listofemails = emailCollection.Find(_ => true).ToList();
+
+
+			foreach (Datamodel moro in listofemails)
+			{
+				DateTime ticketdate = moro.datetimereceived;
+				var result = (DateTime.UtcNow - moro.datetimereceived).TotalHours;
+				var options = new UpdateOptions { IsUpsert = true };
+				var filter = Builders<Datamodel>.Filter.Eq("_id", moro.id);
+
+				if (result > 24 && result < 72)
+				{
+
+					var update = Builders<Datamodel>.Update.Set("colorCode", "yellow");
+					
+					emailCollection.UpdateOne(filter, update, options);
+
+					// yellow color
+				}
+
+				if(result > 72)
+				{
+					var update = Builders<Datamodel>.Update.Set("colorCode", "red");
+
+					emailCollection.UpdateOne(filter, update, options);
+					// red color
+				}
+				else
+				{
+
+					// stays green
+				}
+			}
+
+
 		}
 		public async void DeleteUnreadedMails(string messageconversationid)
 		{
@@ -218,7 +280,7 @@ namespace BlazorApp1.Data
 
 
 
-
+		
 		public async void SendForwardEmail(ItemId id, string text, List<string> receiversList, List<string> CCList)
 		{
 			FindItemsResults<Item> findResults;
@@ -412,11 +474,11 @@ namespace BlazorApp1.Data
 					emailModel.attachment = message.Attachments.Count().ToString();
 					emailModel.message_id = message.Id.ToString();
 					emailModel.datetimecreated = message.DateTimeCreated.ToString();
-					emailModel.datetimereceived = message.DateTimeReceived.ToString();
+					emailModel.datetimereceived = message.DateTimeReceived;
 					emailModel.handler = "";
 					emailModel.solution = "";
 					emailModel.conversationid = message.ConversationId;
-
+					emailModel.colorCode = "green";
 					emailModel.status = "5";
 					// Sets email readed.
 					message.IsRead = true;

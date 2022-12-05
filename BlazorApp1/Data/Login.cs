@@ -3,7 +3,9 @@
 using MongoDB.Driver;
 using BlazorApp1.Models;
 using Microsoft.Extensions.Options;
-
+using System.ComponentModel;
+using static MongoDB.Driver.WriteConcern;
+using MongoDB.Bson;
 
 namespace BlazorApp1.Data
 {
@@ -33,7 +35,27 @@ namespace BlazorApp1.Data
 
         }
 
+        public async void SetNewPassword(string newpassword, ObjectId id )
+        {
+            string mySalt = BC.GenerateSalt(10);
+            string myHash = BC.HashPassword(newpassword, mySalt);
+            var update = Builders<LoginModel>.Update.Set("password", myHash);
+            var filter = Builders<LoginModel>.Filter.Eq("id", id);
+            var options = new UpdateOptions { IsUpsert = true };
+            userNameCollection.UpdateOne(filter, update, options);
+        }
 
+        public async void DeleteUser(ObjectId id)
+        {
+            userNameCollection.DeleteOne(x => x.id == id);
+        }
+
+        public async Task <List<LoginModel>> UserList()
+        {
+            
+
+            return userNameCollection.Find(_ => true).ToList();
+        }
      
         public LoginModel CheckUserLogin(string username, string password)
         {
