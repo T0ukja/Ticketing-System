@@ -20,9 +20,7 @@
 @inject AuthenticationStateProvider authStateProvider;
 @inject AuthenticationStateProvider context;
 
-<h3>Showmailsrazor</h3>
-
-<div style="height: 300px; width: 650px;
+<div style="height: 300px; width: 1550px;
     overflow: auto; ">
 	
 	<table>
@@ -86,7 +84,13 @@
 	
 				<th style="    padding-left: 5px;">
 					<button class="btn btn-primary" @onclick="() => CheckData(message.message_id.ToString(), message.conversationid)">Info</button>
-					<button class="btn btn-primary" @onclick="() => AssingTicket(user.Identity.Name.ToString(), message.message_id)">Assing</button>
+					@if(message.handler == "")
+					{
+						<button class="btn btn-primary" @onclick="() => AssingTicket(user.Identity.Name.ToString(), message.message_id)">Assing</button>
+
+					}
+					<button class="btn btn-primary" @onclick="() => SolveTicket(message)">Mark</button>
+
 				</th>
 
 
@@ -115,8 +119,19 @@
 		}
 	</table>
 </div>
+@if (ShowPopUp == false && showMarkStatus == true)
+{
+	<div style="background-color:white; width: 60vw;  display: flex;">
+		<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; float:left;" @onclick="()=> {showMarkStatus = false; StateHasChanged();}"><i class="fa fa-times fa-2x" aria-hidden="true"></i></button>
 
+		<Extrawindowmodal Comments="Comments" messageid="@messageidforwindow" />
+	</div>
+}
 @code {
+
+
+	private List<Comments> Comments;
+	private string ticketName { get; set; }
 	private ItemId itemidhistory { get; set; }
 	private string emailadress { get; set; }
 	private string InputFrom { get; set; }
@@ -124,6 +139,9 @@
 	private string textbox { get; set; }
 	private bool dialogOpen = false;
 	private AuthenticationState authstate;
+	private bool showMarkStatus = false;
+	private string messageidforwindow { get; set; }
+
 	bool isPressed = false;
 	private List<string> receiverList;
 	private List<string> CCList;
@@ -137,7 +155,8 @@
 	// This is variable is used to get id of conversation which is later compared to dialog email id.
 	private string emailId;
 	// List which is used to get objects from MongoDB database collection.
-	private List<Datamodel> mongoDbList;
+	[Parameter]
+	public List<Datamodel> mongoDbList { get; set; }
 	//private List<Datamodel> mongoDBListJobsInProgress;
 	private string type;
 	private List<string> replymessagecount;
@@ -168,7 +187,6 @@
 	{
 
 
-
 		Emailing.AssingTicket(name, id);
 	}
 	private void DeleteReceiver(string receiver, List<string> lista)
@@ -177,6 +195,14 @@
 	}
 
 
+	private async System.Threading.Tasks.Task SolveTicket(Datamodel message)
+	{
+		showMarkStatus = true;
+		ticketName = message.subject;
+		messageidforwindow = message.message_id;
+		Comments = await Emailing.GetComments(messageidforwindow);
+
+	}
 	private void AddReceiver(string receiver, List<string> lista)
 	{
 		if (lista.Contains(receiver))
@@ -254,9 +280,8 @@
 		// This is the current logged in user
 		user = state.User;
 
-		mongoDbListinProgress = await Emailing.GetMessagesDBInProgressAsync();
+		//mongoDbListinProgress = await Emailing.GetMessagesDBInProgressAsync();
 		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
-		mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
 																//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
 		unreadedMails = await Emailing.GetUnreadedMails();
 		RunTimer();

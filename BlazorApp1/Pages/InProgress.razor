@@ -10,6 +10,7 @@
 @inject Emails Emailing
 @inject AuthenticationStateProvider authStateProvider;
 @inject AuthenticationStateProvider context;
+@attribute [Authorize(Roles = "Administrator, HelpDesk")]
 
 @page "/inprogress"
 
@@ -21,117 +22,15 @@
 	}
 </style>
 <h3>InProgress</h3>
+<h1>@historyListTickets.Count()</h1>
+<Showmailsrazor mongoDbList="historyListTickets" />
 
-
-   		<div style="height: 300px;
-    overflow: hidden; overflow-y: scroll; width:60vw; margin-bottom:40px;">
-<table tickettable>
-	 <tr ticketobject>
-    <th>Subject</th>
-    <th>From</th>
-    <th>Time</th>
-	    <th>Handler</th>
-			    <th></th>
-  </tr>
-  
-
-@foreach (Datamodel message in historyListTickets)
-{
-		<tr subjects>
-		<th>
-			@message.subject
-		</th>
-			<th>
-			@message.sender
-		</th>
-				<th>
-			@message.datetimereceived
-		</th>
-		
-				<th>
-			@message.message_id
-		</th>
-		<th style="    padding-left: 10px;">
-			<button class="btn btn-primary" @onclick="() => CheckData(message.message_id.ToString())">Check Info</button>
-				<button class="btn btn-primary" @onclick="() => SolveTicket(message)">Mark</button>
-
-		</th>
-
-
-		</tr>
-
-
-			@if (emailChain != null && message.message_id.ToString().Equals(emailId) && ShowPopUp)
-			{
-				dialogOpen = true;
-				<div class="modal" tabindex="-1" dialogbox role="dialog" style="margin-top:50px;">
-					<div class="modal-dialog modal-lg">
-						<div class="modal-content">
-
-							<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> ClosePopup()"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
-
-							<Popupmodal message="message" emailChain="emailChain" />
-
-						</div>
-					</div>
-				</div>
-
-
-			}
-		}
-
-</table>
-</div>
-@if (ShowPopUp == false && showMarkStatus == true)
-{
-	<div style="background-color:white; width: 60vw;  display: flex;">
-		<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; float:left;" @onclick="()=> {showMarkStatus = false; StateHasChanged();}"><i class="fa fa-times fa-2x" aria-hidden="true"></i></button>
-
-		<Extrawindowmodal Comments="Comments" messageid="@messageid"/>
-	</div>
-}
 
 @code {
-
-	/*<p style="text-align:center;">Set ticket status</p>
-	 * 
-			<BSInput InputType="InputType.Select" @bind-Value="_value">
-				<option value="null">Open this select menu</option>
-				<option value="1">One</option>
-				<option value="2">Two</option>
-				<option value="3">Three</option>
-			</BSInput>
-
-			<p style="text-align:center;">Write information about status</p>
-			<input @bind="solvebox" style="height:125px; width:325px;" />
-
-			<button type="button" class="btn btn-outline-primary" style=" margin-left:10px; margin-top:10px;;" @onclick="()=> SendMessage()">Set Status</button>*/
 	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
 	private ClaimsPrincipal? user;
 	private List<Datamodel> historyListTickets;
 	
-	private string solvebox { get; set; }
-
-	private bool dialogOpen = false;
-	private bool showMarkStatus = false;
-
-	private string emailId;
-	bool ShowPopUp = false;
-	private string messageid { get; set; }
-
-	private List<Comments> Comments;
-	private string ticketName { get; set; }
-	ConversationResponse emailChain;
-	private async System.Threading.Tasks.Task CheckData(string id)
-	{
-		// Getting conversation of email to list.
-		emailChain = await Emailing.GetConversion(id);
-		// Assigning id, which is compared later in dialog.
-		emailId = id;
-		// This opens dialog when true.
-		ShowPopUp = true;
-
-	}
 
 
 	//user.Identity.Name.ToString(),
@@ -144,37 +43,4 @@
 
 	}
 
-
-	private async System.Threading.Tasks.Task SolveTicket(Datamodel message)
-	{
-		showMarkStatus = true;
-		ticketName = message.subject;
-		messageid = message.message_id;
-		Comments = await Emailing.GetComments(messageid);
-
-	}
-
-	void SendMessage()
-	{
-		// Backend function to send message here
-		showMarkStatus = false;
-	}
-	void ClosePopup()
-    {
-		// Changes value to false to shutdown dialog module
-		ShowPopUp = false;
-
-		// Changes website state without reload.
-		StateHasChanged();
-
-	}
-	void CloseMarkWindow()
-	{
-		// Changes value to false to shutdown dialog module
-		showMarkStatus = false;
-
-		// Changes website state without reload.
-		StateHasChanged();
-
-	}
 }

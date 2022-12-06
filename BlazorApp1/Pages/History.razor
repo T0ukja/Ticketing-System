@@ -8,6 +8,7 @@
 @using Microsoft.AspNetCore.Identity;
 @using System.Security.Claims
 @inject Emails emailing;
+@attribute [Authorize(Roles = "Administrator, HelpDesk")]
 
 <style>
 
@@ -17,130 +18,15 @@
 </style>
 <h1>Here you see tickets that are done or suspended</h1> 
 
-<h1>@messageid</h1>
-<h1>messageid</h1>
- 		<div style="height: 300px;
-    overflow: hidden; overflow-y: scroll; ">
-<table tickettable>
-	 <tr ticketobject>
-    <th>Subject</th>
-    <th>From</th>
-    <th>Time</th>
-	    <th>Handler</th>
-		<th>Solving time</th>
-		<th>Datetime Received</th>
-			    <th></th>
-  </tr>
-  
-
-@foreach (Datamodel message in historyLog)
-{
-		<tr subjects>
-		<th>
-			@message.subject
-		</th>
-			<th>
-			@message.sender
-		</th>
-				<th>
-			@message.datetimereceived
-		</th>
-		
-				<th>
-			@message.handler
-		</th>
-			<th>
-			@message.handler
-		</th>
-			<th>
-			@message.handler
-		</th>
-		<th style="    padding-left: 10px;">
-			<button class="btn btn-primary" @onclick="() => CheckData(message.message_id.ToString())">Check Info</button>
-					<button class="btn btn-primary" @onclick="() => SolveTicket(message)">Mark</button>
-
-
-		</th>
-
-
-		</tr>
-
-
-		
-			@if (emailChain != null && message.message_id.ToString().Equals(emailId) && ShowPopUp)
-			{
-				dialogOpen = true;
-				<div class="modal" tabindex="-1" dialogbox role="dialog" style="margin-top:50px;">
-					<div class="modal-dialog modal-lg">
-						<div class="modal-content">
-
-							<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> ClosePopup()"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
-							
-							<Popupmodal message="message" emailChain="emailChain" />
-
-						</div>
-					</div>
-				</div>
-
-
-			}
-			}
-</table>
-</div>
-
-@if (ShowPopUp == false && showMarkStatus == true)
-{
-
-	<div style="background-color:white; width: 60vw;  display: flex;">
-		<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; float:left;" @onclick="()=> {showMarkStatus = false; StateHasChanged();}"><i class="fa fa-times fa-2x" aria-hidden="true"></i></button>
-
-		<Extrawindowmodal Comments="Comments" messageid="@messageid" />
-	</div>
-}
 
 
 @code {
-	private string emailId;
-	bool ShowPopUp = false;
-	List<Datamodel> historyLog;
-	private bool dialogOpen = false;
-	private bool showMarkStatus = false;
-	private bool openCommentBox = false;
-	private bool openStatusBox = false;
-	ConversationResponse emailChain;
 
-	private string messageid { get; set; }
+  //  List<Datamodel> historyLog;
 
-	private List<Comments> Comments;
-	private string ticketName { get; set; }
-	protected override async System.Threading.Tasks.Task OnInitializedAsync(){
-		historyLog = await emailing.getHistory();
-	} 
-
-private async System.Threading.Tasks.Task CheckData(string id)
+	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
-		// Getting conversation of email to list.
-		emailChain = await emailing.GetConversion(id);
-		// Assigning id, which is compared later in dialog.
-		emailId = id;
-		// This opens dialog when true.
-		ShowPopUp = true;
+//	historyLog = await emailing.getHistory();
+} 
 
-	}
-	private async System.Threading.Tasks.Task SolveTicket(Datamodel message)
-	{
-		showMarkStatus = true;
-		ticketName = message.subject;
-		messageid = message.message_id;
-		Comments = await emailing.GetComments(message.message_id.ToString());
-
-	}
-	void ClosePopup()
-    {
-		// Changes value to false to shutdown dialog module
-		ShowPopUp = false;
-		// Changes website state without reload.
-		StateHasChanged();
-
-	}
 }
