@@ -14,7 +14,7 @@ namespace BlazorApp1.Models
     public string sender { get; set; }
     public string attachment { get; set; }
     public string message_id { get; set; }
-    public string datetimecreated { get; set; }
+    public DateTime solutiondatetime { get; set; }
     public DateTime datetimereceived { get; set; }
     public string handler { get; set; }
 	public string solution { get; set; }

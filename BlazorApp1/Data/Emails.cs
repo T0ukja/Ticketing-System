@@ -48,7 +48,7 @@ namespace BlazorApp1.Data
 		private string emailurl;
 
 
-		PeriodicTimer periodicTimer = new(TimeSpan.FromHours(2));
+		//	PeriodicTimer periodicTimer = new(TimeSpan.FromHours(2));
 
 		public IMemoryCache MemoryCache { get; }
 
@@ -110,23 +110,11 @@ namespace BlazorApp1.Data
 			System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
 
 
-			RunTimer();
+		
 
 		}
 
-		async void RunTimer()
-		{
-			// Timer function.
-			while (await periodicTimer.WaitForNextTickAsync())
-			{
-				// Do check to verify that there is new email
-				// Get new emails and updates list.
-				UpdateColorStatus();
-
-
-
-			}
-		}
+	
 
 		public async void UpdateColorStatus()
 		{
@@ -473,7 +461,7 @@ namespace BlazorApp1.Data
 					emailModel.sender = message.Sender.Address.ToString();
 					emailModel.attachment = message.Attachments.Count().ToString();
 					emailModel.message_id = message.Id.ToString();
-					emailModel.datetimecreated = message.DateTimeCreated.ToString();
+					emailModel.solutiondatetime = message.DateTimeReceived.AddDays(3);
 					emailModel.datetimereceived = message.DateTimeReceived;
 					emailModel.handler = "";
 					emailModel.solution = "";
@@ -530,7 +518,8 @@ namespace BlazorApp1.Data
 
 
 				}
-				if ((message.IsRead == false) && (message.InReplyTo != null)) //if the current message is unread
+				else {
+				if ((message.IsRead == false)) //if the current message is unread
 				{
 					message.Load();
 					message.IsRead = true;
@@ -550,9 +539,9 @@ namespace BlazorApp1.Data
 
 				}
 
+                }
 
-
-			}
+            }
 
 
 		}

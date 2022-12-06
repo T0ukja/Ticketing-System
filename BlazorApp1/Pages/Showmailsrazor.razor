@@ -31,6 +31,7 @@
 			<th>From</th>
 			<th>Time</th>
 			<th>Unreaded mails</th>
+			<th>Status</th>
 		</tr>
 
 		@foreach (Datamodel message in mongoDbList)
@@ -53,9 +54,36 @@
 						!!!
 						</th>
 	}
+
 					
 				</th>
 
+				<th>
+					@switch (message.colorCode
+							)
+					{
+						case "green":
+							<th style="background-color:green;">
+@message.solutiondatetime.Date
+</th>
+							break;
+
+						case "yellow":
+						<th style="background-color:yellow;">
+						@message.solutiondatetime
+						</th>
+
+							break;
+						case "red":
+						<th style="background-color:red;">
+						@message.solutiondatetime
+						</th>
+
+							break;
+					}
+
+				</th>
+	
 				<th style="    padding-left: 5px;">
 					<button class="btn btn-primary" @onclick="() => CheckData(message.message_id.ToString(), message.conversationid)">Info</button>
 					<button class="btn btn-primary" @onclick="() => AssingTicket(user.Identity.Name.ToString(), message.message_id)">Assing</button>
@@ -118,6 +146,7 @@
 	// Used to loop email conversation messages.
 	// Timer which is assigned 15 seconds (Updates every 5 seconds).
 	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(10));
+
 	// bool variable for dialog state.
 	bool ShowPopUp = false;
 
@@ -218,7 +247,7 @@
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
 
-
+		Emailing.UpdateColorStatus();
 
 
 		var state = await provider;
@@ -312,6 +341,7 @@
 		StateHasChanged();
 
 	}
+
 	async void RunTimer()
 	{
 		// Timer function.
@@ -328,6 +358,10 @@
 
 
 		}
+
+
+
+		
 	}
 
 }
