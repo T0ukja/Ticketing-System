@@ -20,21 +20,22 @@
 @inject AuthenticationStateProvider authStateProvider;
 @inject AuthenticationStateProvider context;
 
-<div style="height: 300px; width: 1550px;
+<div style="height: 300px; ;
     overflow: auto; ">
 	
-	<table>
-		<tr>
+	<table style="width: 1550px;">
+		<tr style="text-align:center; align-content:center; border: 3px solid black; align-items:center;">
 			<th>Subject</th>
 			<th>From</th>
 			<th>Time</th>
 			<th>Unreaded mails</th>
 			<th>Status</th>
+			<th>Actions</th>
 		</tr>
 
 		@foreach (Datamodel message in mongoDbList)
 		{
-			<tr>
+			<tr style="text-align:center; align-content:center; border: 1px solid black; align-items:center;">
 				<th>
 					@message.subject
 				</th>
@@ -46,17 +47,20 @@
 				</th>
 				
 				<th>
+			
 					@if (unreadedMails.Exists(a=>a.EmailConversationId == message.conversationid))
 					{
-					<th>
-						!!!
-						</th>
-	}
-
+					<p>
+							!!!
+						</p>
 					
+	}
 				</th>
 
-				<th>
+					
+			
+
+				
 					@switch (message.colorCode
 							)
 					{
@@ -67,7 +71,7 @@
 							break;
 
 						case "yellow":
-						<th style="background-color:yellow;">
+						<th style="background-color:yellow; ">
 						@message.solutiondatetime
 						</th>
 
@@ -80,7 +84,7 @@
 							break;
 					}
 
-				</th>
+				
 	
 				<th style="    padding-left: 5px;">
 					<button class="btn btn-primary" @onclick="() => CheckData(message.message_id.ToString(), message.conversationid)">Info</button>
@@ -100,9 +104,9 @@
 			@if (emailChain != null && message.message_id.ToString().Equals(emailId) && ShowPopUp)
 			{
 				dialogOpen = true;
-				<div class="modal" tabindex="-1" dialogbox role="dialog" style="margin-top:50px;">
+				<div class="modal" tabindex="-1" dialogbox role="dialog" style="margin-top:50px; height:1200px;">
 					<div class="modal-dialog modal-lg">
-						<div class="modal-content">
+						<div class="modal-content" >
 
 							<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> ClosePopup()"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
 
@@ -145,8 +149,7 @@
 	bool isPressed = false;
 	private List<string> receiverList;
 	private List<string> CCList;
-	private bool isEmpty;
-	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
+//	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
 	private ClaimsPrincipal? user;
 	private ItemId messageid;
 	private int buttonStatus { get; set; }
@@ -159,8 +162,6 @@
 	public List<Datamodel> mongoDbList { get; set; }
 	//private List<Datamodel> mongoDBListJobsInProgress;
 	private string type;
-	private List<string> replymessagecount;
-	private List<Datamodel> mongoDbListinProgress;
 	private List<NewEmails> unreadedMails;
 	// Used to loop email conversation messages.
 	// Timer which is assigned 15 seconds (Updates every 5 seconds).
@@ -273,18 +274,8 @@
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
 
-		Emailing.UpdateColorStatus();
 
-
-		var state = await provider;
-		// This is the current logged in user
-		user = state.User;
-
-		//mongoDbListinProgress = await Emailing.GetMessagesDBInProgressAsync();
-		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
-																//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
 		unreadedMails = await Emailing.GetUnreadedMails();
-		RunTimer();
 	}
 	void loopdata(EmailMessage messageitem)
 	{
@@ -372,10 +363,11 @@
 		// Timer function.
 		while (await periodicTimer.WaitForNextTickAsync())
 		{
+			Emailing.UpdateColorStatus();
+			Emailing.GetEmails();
 			// Do check to verify that there is new email
 			// Get new emails and updates list.
-			mongoDbList = await Emailing.GetMessagesDbAsync();
-			//replymessagecount = Emailing.GetEmails();
+			//mongoDbList = await Emailing.GetMessagesDbAsync();
 			unreadedMails = await Emailing.GetUnreadedMails();
 
 			StateHasChanged();

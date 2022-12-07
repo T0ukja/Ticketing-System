@@ -6,6 +6,7 @@
 @using BlazorApp1.Models;
 @using Microsoft.AspNetCore.Identity;
 @using System.Security.Claims;
+@inject IJSRuntime JSRuntime
 
 @inject Emails Emailing
 @inject AuthenticationStateProvider authStateProvider;
@@ -34,9 +35,23 @@
 	[Parameter]
 	public string messageid { get; set; }
 	public Datamodel datamodeli;
-	private void SetStatus()
+	private bool isHistory = false;
+	private async void SetStatus()
 	{
-		Emailing.SetTicketStatus(_value, solvebox,messageid);
+		if (isHistory)
+		{
+			Emailing.SetTicketStatusHistory(_value, solvebox, messageid);
+			await JSRuntime.InvokeVoidAsync("alert", "Status changed, you can close window now");
+
+		}
+		else
+		{
+			
+		
+			await JSRuntime.InvokeVoidAsync("alert", "Password is changed!");
+
+			Emailing.SetTicketStatus(_value, solvebox, messageid);
+		}
 	}
 
 
@@ -45,7 +60,19 @@
 	{
 
 		datamodeli = await Emailing.GetTicketStatus(messageid);
-		_value = datamodeli.status;
+		if(datamodeli != null)
+		{
+			_value = datamodeli.status;
+
+		}
+		else
+		{
+
+			datamodeli = await Emailing.GetTicketStatusFromHistory(messageid);
+			_value = datamodeli.status;
+			isHistory = true;
+
+		}
 
 	}
 }

@@ -34,10 +34,12 @@
 
    		
 <Showmailsrazor mongoDbList="mongoDbList"/>
+<br />
+<br />
 
+<h1>Tickets that are in progress (@mongoDBListInProgress.Count())</h1>
 
-
-
+<Showmailsrazor mongoDbList="mongoDBListInProgress"/>
 <br />
 <br />
 
@@ -48,6 +50,9 @@
 
 @code {
 	private List<Datamodel> mongoDbList;
+
+	private List<Datamodel> mongoDBListInProgress;
+
 	private AuthenticationState authstate;
 	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
 	private ClaimsPrincipal? user;
@@ -60,6 +65,8 @@
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
 		mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
+		mongoDBListInProgress = await Emailing.GetTicketsInProgress();
+		//	Emailing.GetEmails();
 
 
 		var state = await provider;
@@ -67,8 +74,8 @@
 		user = state.User;
 
 		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
-		mongoDbList = await Emailing.GetMessagesDbAsync();
-		
+
+		RunTimer();
 		// Starts 5 second timer													
 	}
 
@@ -81,7 +88,7 @@
 			// Get new emails and updates list.
 			Emailing.GetEmails();
 			mongoDbList = await Emailing.GetMessagesDbAsync();
-
+			mongoDBListInProgress = await Emailing.GetTicketsInProgress();
 			StateHasChanged();
 
 

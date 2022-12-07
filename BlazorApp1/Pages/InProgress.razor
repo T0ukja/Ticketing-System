@@ -21,8 +21,7 @@
 		background-color: #92c5ef;
 	}
 </style>
-<h3>InProgress</h3>
-<h1>@historyListTickets.Count()</h1>
+<h3>InProgress (@historyListTickets.Count())</h3>
 <Showmailsrazor mongoDbList="historyListTickets" />
 
 
@@ -32,8 +31,6 @@
 	private List<Datamodel> historyListTickets;
 	
 
-
-	//user.Identity.Name.ToString(),
 	protected override async System.Threading.Tasks.Task OnInitializedAsync(){
 		var state = await provider;
 		// This is the current logged in user

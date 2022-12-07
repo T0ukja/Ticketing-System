@@ -18,15 +18,15 @@
 </style>
 <h1>Here you see tickets that are done or suspended</h1> 
 
-
+<Showmailsrazor mongoDbList="historyLog"/>
 
 @code {
 
-  //  List<Datamodel> historyLog;
+    List<Datamodel> historyLog;
 
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
-//	historyLog = await emailing.getHistory();
+	historyLog = await emailing.getHistory();
 } 
 
 }

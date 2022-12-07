@@ -242,8 +242,6 @@ namespace BlazorApp1.Data
 			try
 			{
 
-
-
 				// Object for reading email.
 				EmailMessage email = EmailMessage.Bind(service, new ItemId(messageId));
 				// Get the conversation identifier of an item. 
@@ -291,8 +289,6 @@ namespace BlazorApp1.Data
 
 			// Sets text for forward message.
 			response.BodyPrefix = text;
-
-
 
 			// Looping lists of CC/to recipients.
 			foreach (string s in CCList)
@@ -445,6 +441,7 @@ namespace BlazorApp1.Data
 				{
 					if ((message.IsRead == false)) //if the current message is unread
 					{
+
 						message.Load();
 						message.IsRead = true;
 
@@ -461,8 +458,8 @@ namespace BlazorApp1.Data
 
 						message.Update(ConflictResolutionMode.AlwaysOverwrite);
 
-					}
 
+					}
 				}
 
 			}
@@ -507,6 +504,11 @@ namespace BlazorApp1.Data
 			return listOfEmails;
 
 		}
+		public async Task<List<Datamodel>> GetTicketsInProgress()
+		{
+			List<Datamodel> listOfEmails = emailCollection.Find(x => x.handler != "").ToList();
+			return listOfEmails;
+		}
 		public async void ChangeTicketCollection(string messageid, string status)
 		{
 			try
@@ -522,6 +524,14 @@ namespace BlazorApp1.Data
 			{
 				_logger.LogInformation(e.ToString());
 			}
+		}
+
+
+		public async Task<Datamodel> GetTicketStatusFromHistory(string messageid)
+		{
+			Datamodel email = new Datamodel();
+			email = historyCollection.Find(x => x.message_id.Equals(messageid)).FirstOrDefault();
+			return email;
 		}
 		public async void AssingTicket(string name, string messageid)
 		{
@@ -544,6 +554,28 @@ namespace BlazorApp1.Data
 			}
 
 		}
+
+
+		public void SetTicketStatusHistory(string _value, string solvetext, string messageid)
+		{
+			Datamodel ticket = historyCollection.Find(x => x.message_id == messageid).FirstOrDefault();
+			if (_value == "1")
+			{
+				
+			}
+			else
+			{
+				ticket.status = _value;
+				ticket.solution = solvetext;
+				emailCollection.InsertOneAsync(ticket);
+				historyCollection.DeleteOne(x => x.message_id == messageid);
+
+			}
+
+
+		}
+
+
 		public void SetTicketStatus(string _value, string solvetext, string messageid)
 		{
 

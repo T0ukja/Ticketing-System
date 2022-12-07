@@ -91,6 +91,7 @@
 
     private async Task OpenSettings(){
 
+        navManager.NavigateTo("/change", true);
     }
         private async Task LogOut(){
          var customAuthenticationProvider = (CustomAuthenticationProvider)authStateProvider;

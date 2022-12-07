@@ -14,6 +14,10 @@
 </style>
 <h3>Register</h3>
 <div>
+    <div style="width: 250px;
+    float: left;
+    padding: 20px;
+">
     <p>
         UserName
     </p>
@@ -27,19 +31,23 @@
 <p>
     <input @bind="registerp" />
 </p>
-<div style = "width:100px;">
-       <ListGroup Mode="ListGroupMode.Selectable" @bind-SelectedItem="selecterRole">
-    <ListGroupItem Name="Administrator">Admin</ListGroupItem>
-    <ListGroupItem Name="HelpDesk">HelpDesk</ListGroupItem>
-</ListGroup>
-</div>
-<button type="button" class="close" @onclick="()=> CreateUser(registeru,registerp,selecterRole)">
-    Register
-</button>
+        <button type="button" class="btn btn-primary" @onclick="()=> CreateUser(registeru,registerp,selecterRole)">
+            Register
+        </button>
+
 
 </div>
-
-
+    <div style="width:150px;
+             float: left;
+             padding: 20px;"
+             >
+        <ListGroup Mode="ListGroupMode.Selectable" @bind-SelectedItem="selecterRole">
+            <ListGroupItem Name="Administrator">Admin</ListGroupItem>
+            <ListGroupItem Name="HelpDesk">HelpDesk</ListGroupItem>
+        </ListGroup>
+    </div>
+ 
+</div>
 
 
 
@@ -147,7 +155,7 @@ padding-left:25px;
                 </div>
             </div>
       
-   
+
 
 }
 
@@ -197,12 +205,25 @@ padding-left:25px;
     private async Task CreateUser(string registeru, string registerp, string type) {
         if(selecterRole == null || registeru == "" || registerp == "")
         {
-                    await JSRuntime.InvokeVoidAsync("alert", "Fill all needed values for user");
+            await JSRuntime.InvokeVoidAsync("alert", "Fill all needed values for user");
 
         }
         else
         {
-                    await login.CreateNewUser(registeru, registerp, type);
+            bool checkValue = login.CheckIfUserExists(registeru);
+            if (checkValue)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "User already exists!");
+
+            }
+            else
+            {
+                await login.CreateNewUser(registeru, registerp, type);
+                await JSRuntime.InvokeVoidAsync("alert", "User created succesfully");
+
+            }
+
+           
 
         }
 

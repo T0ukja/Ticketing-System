@@ -16,9 +16,44 @@
 
 
 <div class="modal-header" style="align-self:center; margin-top:-20px;">
-	<h1>
-		@message.subject
+	<div container1>
+
+	
+	<div>
+	<h1 style="font-size:25px;">
+	<div style="align-self:flex-start; ">
+			<span style="font-weight:bold;">Subject: </span>  <span>@message.subject</span>
+		
+		<br/>
+			<span style="font-weight:bold;">Handler: </span>  <span>@message.handler</span>
+
+			
+		</div>
+
+	<br/>
 	</h1>
+	</div>
+	
+		
+			<div>
+				<h1 style="font-size:25px; align-content:center; text-align:center;">
+					<div style="align-self:flex-start; ">
+						<span style="font-weight:bold; ">Solution: </span> 
+
+						<br />
+					
+				
+
+
+					</div>
+
+						<span style="font-size:25px;">@message.solution</span>
+					<br />
+				</h1>
+			</div>
+	
+
+	</div>
 </div>
 <div class="modal-body" id="listitems">
 
@@ -86,10 +121,10 @@
 								<i aa class="fa fa-reply fa-2x" aria-hidden="true"></i>
 							</a>
 
-							<a href="javascript::void(0)" @onclick="()=>SendReplyAll(item.Id, item, item.IsFromMe)">
+							<a href="javascript::void(0)" @onclick="()=>ReplyButtonAll(item.Id, item, item.IsFromMe)">
 								<i aa class="fa fa-reply-all fa-2x" aria-hidden="true"></i>
 							</a>
-							<a href="javascript::void(0)" @onclick="()=>SendForwardMessage(item.Id)">
+							<a href="javascript::void(0)" @onclick="()=>ReplyButtonForward(item.Id, item, item.IsFromMe)">
 
 								<i aa class="fa fa-share fa-2x" aria-hidden="true"></i>
 							</a>
@@ -130,7 +165,7 @@
 
 
 
-
+				
 				@if (item.Id == messageid)
 				{
 					@if (type == "Reply")
@@ -267,6 +302,66 @@
 
 						</div>
 					}
+
+					@if (type == "Forward")
+					{
+						<div style="border:3px solid black; margin-top:10px; margin-bottom;10px; margin-left:10px; margin-right:10px; background-color:lightblue;">
+
+							<p>
+								To
+								<input @bind="emailadress" />
+							</p>
+
+							<p>
+								CC
+								<input @bind="cc" />
+							</p>
+							<p>Address List</p>
+							@if (receiverList != null)
+							{
+								<p>To</p>
+
+								@foreach (string receiver in receiverList)
+								{
+									<div style="display:flex; width: 300px;  margin-left:50px;">
+
+										<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">@receiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(receiver, receiverList)">
+											<i class="fa fa-window-close fa-2x" aria-hidden="true" style="align-content:center;justify-content: center; display:flex;"></i>
+										</button>
+									</div>
+								}
+
+
+
+							}
+
+							@if (CCList != null)
+							{
+								<p>CC</p>
+
+								@foreach (string receiver in CCList)
+								{
+									<div style="display:flex; width: 300px;  margin-left:50px;">
+
+										<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">CC @receiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(receiver, CCList)">
+											<i class="fa fa-window-close fa-2x" aria-hidden="true" style="align-content:center;justify-content: center; display:flex;"></i>
+										</button>
+									</div>
+								}
+							}
+							<p>
+								Input
+								<input @bind="textbox" style="width: 90%; height: 150px;" />
+							</p>
+							<button type="button" class="btn btn-outline-primary rounded-circle" style="Width:50px; Height:50px;" @onclick="() => SendForwardReply(item.Id.ToString(),receiverList,CCList)">
+								<i class="fa fa-paper-plane fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
+							</button>
+							<button type="button" class="btn btn-outline-primary rounded-circle" style="width:50px; height:50px;" @onclick="()=>{isPressed = false; messageid = null; StateHasChanged();}">
+								<i class="fa fa-times fa-2x" aria-hidden="true"></i>
+							</button>
+
+						</div>
+					}
 				}
 
 			</div>
@@ -345,7 +440,7 @@
 
 
 	}
-	void SendReplyAll(ItemId objectid, EmailMessage messageitem, bool isFromMe)
+	void ReplyButtonAll(ItemId objectid, EmailMessage messageitem, bool isFromMe)
 	{
 		type = "ReplyAll";
 
@@ -357,7 +452,17 @@
 
 
 	}
+	private void ReplyButtonForward(ItemId objectid, EmailMessage messageitem, bool isFromMe)
+	{
+		type = "Forward";
 
+		isPressed = true;
+		messageid = objectid;
+		receiverList = new List<string>();
+		CCList = new List<string>();
+		loopdata(messageitem);
+
+	}
 
 	private async System.Threading.Tasks.Task AssingTickett(string name, string id)
 	{
@@ -409,6 +514,29 @@
 
 
 
+
+
+	private async System.Threading.Tasks.Task SendForwardReply(ItemId id, List<string> receivers, List<string> ccreceivers)
+	{
+		
+		isPressed = false;
+		messageid = null;
+
+		StateHasChanged();
+
+		if (receivers != null)
+		{
+			Emailing.SendForwardEmail(id, textbox, receivers, ccreceivers);
+		}
+		else
+		{
+			await JSRuntime.InvokeVoidAsync("alert", "Add To receiver!!");
+		}
+		//ItemId id, ObjectId messageconversationid,string type, string addparam, string text, string cc,)
+		CCList = null;
+		receiverList = null;
+	}
+
 	private async System.Threading.Tasks.Task SendReply(ItemId id, List<string> receivers, List<string> ccreceivers)
 	{
 		// Need's send mail function
@@ -417,20 +545,19 @@
 
 		StateHasChanged();
 
-		Emailing.SendMail(id, textbox, receivers, ccreceivers);
+		if(receivers != null)
+		{
+			Emailing.SendMail(id, textbox, receivers, ccreceivers);
+		}
+		else
+		{
+			await JSRuntime.InvokeVoidAsync("alert", "Add To receiver!!");
+		}
 		//ItemId id, ObjectId messageconversationid,string type, string addparam, string text, string cc,)
 		CCList = null;
 		receiverList = null;
 	}
-	private void SendForwardMessage(ItemId id)
-	{
-		type = "Forward";
-
-		isPressed = true;
-		messageid = null;
-		StateHasChanged();
-
-	}
+	
 	private void ChangeValue()
 	{
 		isPressed = false;
@@ -450,7 +577,6 @@
 		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
 		mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
 																//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
-		//RunTimer();
 	}
 
 

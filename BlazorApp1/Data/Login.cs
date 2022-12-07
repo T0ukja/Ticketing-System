@@ -44,12 +44,44 @@ namespace BlazorApp1.Data
             var options = new UpdateOptions { IsUpsert = true };
             userNameCollection.UpdateOne(filter, update, options);
         }
+		public bool ChangePassword(string oldpassword, string newpassword, string name)
+		{
+            var DBuserLoginData = userNameCollection.Find(m => m.username == name).FirstOrDefault();
+
+            bool doesPasswordMatch = BC.Verify(oldpassword, DBuserLoginData.password);
+
+            if (doesPasswordMatch)
+            {
+                string mySalt = BC.GenerateSalt(10);
+                string myHash = BC.HashPassword(newpassword, mySalt);
+                var update = Builders<LoginModel>.Update.Set("password", myHash);
+                var filter = Builders<LoginModel>.Filter.Eq("username", name);
+                var options = new UpdateOptions { IsUpsert = true };
+                userNameCollection.UpdateOne(filter, update, options);
+
+                return true;
+            }
+
+            else
+            {
+                return false;
+            }
+
+        }
 
         public async void DeleteUser(ObjectId id)
         {
             userNameCollection.DeleteOne(x => x.id == id);
         }
+        public bool CheckIfUserExists(string name)
+        {
 
+			if (userNameCollection.Find(x => x.username == name).Any())
+            {
+                return true;
+            }
+            return false;
+        }
         public async Task <List<LoginModel>> UserList()
         {
             
