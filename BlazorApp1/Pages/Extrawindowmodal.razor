@@ -8,11 +8,8 @@
 @using System.Security.Claims
 @using MongoDB.Bson
 @inject Emails Emailing
-@inject NavigationManager navManager;
 @inject IJSRuntime JSRuntime
 @attribute [Authorize(Roles = "Administrator, HelpDesk")]
-@inject AuthenticationStateProvider authStateProvider;
-@inject AuthenticationStateProvider context;
 
 <div style="width:65%; margin-left:20px; margin-top:40px; height:430px; overflow: auto;">
 
@@ -80,22 +77,29 @@ padding-left:25px;
 
 </div>
 @code {
+
+	// Parameters for this modal.
 	[Parameter]
 	public string messageid { get; set; }
 
 	[Parameter]
 	public List<Comments> Comments { get; set; }
 
+	// bool values for opening commenting or status window.
 	private bool openCommentBox = false;
 	private bool openStatusBox = false;
+
+	// Timer variable.
 	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(10));
 
 
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
+		// Timer used to get new comments.
 		RunTimer();
 
 	}
+	// Timer function.
 	async void RunTimer()
 	{
 		// Timer function.
@@ -105,6 +109,7 @@ padding-left:25px;
 			// Get new emails and updates list.
 			Comments = await Emailing.GetComments(messageid);
 
+			// Refresh state.
 			StateHasChanged();
 
 

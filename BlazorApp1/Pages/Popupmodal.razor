@@ -8,19 +8,51 @@
 @using System.Security.Claims
 @using MongoDB.Bson
 @inject Emails Emailing
-@inject NavigationManager navManager;
 @inject IJSRuntime JSRuntime
 @attribute [Authorize(Roles = "Administrator, HelpDesk")]
-@inject AuthenticationStateProvider authStateProvider;
-@inject AuthenticationStateProvider context;
 
 
 <div class="modal-header" style="align-self:center; margin-top:-20px;">
-	<h1>
-		@message.subject
-	</h1>
+	<div container1>
+
+
+		<div>
+			<h1 style="font-size:25px;">
+				<div style="align-self:flex-start; ">
+					<span style="font-weight:bold;">Subject: </span>  <span>@message.subject</span>
+
+					<br />
+					<span style="font-weight:bold;">Handler: </span>  <span>@message.handler</span>
+
+
+				</div>
+
+				<br />
+			</h1>
+		</div>
+
+
+		<div>
+			<h1 style="font-size:25px; align-content:center; text-align:center;">
+				<div style="align-self:flex-start; ">
+					<span style="font-weight:bold; ">Solution: </span>
+
+					<br />
+
+
+
+
+				</div>
+
+				<span style="font-size:25px;">@message.solution</span>
+				<br />
+			</h1>
+		</div>
+
+
+	</div>
 </div>
-<div class="modal-body" id="listitems">
+<div class="modal-body" id="listitems" style="overflow:auto; height:700px;">
 
 
 	@foreach (ConversationNode node in emailChain.ConversationNodes)
@@ -30,7 +62,7 @@
 		{
 
 
-			var index = @item.TextBody.Text.ToString().IndexOf("_");
+			var index = @item.TextBody.Text.IndexOf("_");
 			<br />
 			<div id="divTest" style="border:1px solid black; border-radius: 5px; ">
 
@@ -38,7 +70,7 @@
 ">
 
 					<div style="margin-left:50px; justify-content:center;">
-						From : @item.From.Address.ToString()
+						From : @item.From.Address
 						<br />
 						@if (@item.ToRecipients.Count != 0)
 						{
@@ -50,7 +82,7 @@
 								To :
 								@foreach (EmailAddress emailmessaage in item.ToRecipients)
 								{
-								<p>	@emailmessaage.Address.ToString(), </p>
+								<p>	@emailmessaage.Address, </p>
 								}
 							</p>
 						}
@@ -66,7 +98,7 @@
 								CC :
 								@foreach (EmailAddress emailmessaage in item.CcRecipients)
 								{
-								<p>	@emailmessaage.Address.ToString(), </p>
+								<p>	@emailmessaage.Address, </p>
 								}
 							</p>
 						}
@@ -86,10 +118,10 @@
 								<i aa class="fa fa-reply fa-2x" aria-hidden="true"></i>
 							</a>
 
-							<a href="javascript::void(0)" @onclick="()=>SendReplyAll(item.Id, item, item.IsFromMe)">
+							<a href="javascript::void(0)" @onclick="()=>ReplyButtonAll(item.Id, item, item.IsFromMe)">
 								<i aa class="fa fa-reply-all fa-2x" aria-hidden="true"></i>
 							</a>
-							<a href="javascript::void(0)" @onclick="()=>SendForwardMessage(item.Id)">
+							<a href="javascript::void(0)" @onclick="()=>ReplyButtonForward(item.Id, item, item.IsFromMe)">
 
 								<i aa class="fa fa-share fa-2x" aria-hidden="true"></i>
 							</a>
@@ -102,13 +134,13 @@
 				{
 
 					<div style="text-align:left; margin-left:15px;">
-						@item.TextBody.Text.Remove(index).ToString()
+						@item.TextBody.Text.Remove(index)
 						<br />
 						<a href="javascript::void(0)" @onclick="()=>ShowHistory(item.Id)">Show history</a>
 
 						@if (item.Id.Equals(itemidhistory))
 						{
-							@item.TextBody.Text.ToString()
+							@item.TextBody.Text
 						}
 					</div>
 
@@ -120,7 +152,7 @@
 
 					<div style="text-align:left; margin-left:15px;">
 
-						@item.TextBody.Text.ToString()
+						@item.TextBody.Text
 					</div>
 
 
@@ -133,140 +165,76 @@
 
 				@if (item.Id == messageid)
 				{
-					@if (type == "Reply")
-					{
 
 
-						<div style="border:3px solid black; margin-top:10px; margin-bottom;10px; margin-left:10px; margin-right:10px; background-color:lightblue;">
-							<div style="display:flex;">
-								<p>
-									Add receivers
-									<input @bind="InputFrom" style="width: 380px; height: 20px;" />
+							<div style="border:3px solid black; margin-top:10px; margin-bottom;10px; margin-left:10px; margin-right:10px; background-color:lightblue;">
+								<div style="display:flex;">
+									<p>
+										Add receivers
+										<input @bind="InputFrom" style="width: 380px; height: 20px;" />
+									</p>
+									<button type="button" class="btn btn-outline-primary rounded-circle" style="width:40px; height:40px; margin-left:10px;" @onclick="() => AddReceiver(InputFrom,receiverList)">
+										<i class="fa fa-plus" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
+									</button>
+
+
+								</div>
+								<div style="display:flex;">
+									<p>
+										Add CC
+										<input @bind="cc" style="width: 380px; height: 20px;" />
+									</p>
+									<button type="button" class="btn btn-outline-primary rounded-circle" style="width:40px; height:40px; margin-left:10px;" @onclick="() => AddReceiver(cc, CCList)">
+										<i class="fa fa-plus" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
+									</button>
+								</div>
+
+								@if (receiverList != null)
+								{
+									<p>To</p>
+									@foreach (string receiver in receiverList)
+									{
+
+										<div style="display:flex; width: 300px;  margin-left:50px;">
+
+											<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">@receiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(receiver, receiverList)">
+												<i class="fa fa-window-close fa-2x" aria-hidden="true" style="align-content:center;justify-content: center; display:flex;"></i>
+											</button>
+										</div>
+									}
+
+
+								}
+								@if (CCList != null)
+								{
+									<p>CC</p>
+									@foreach (string ccreceiver in CCList)
+									{
+
+										<div style="display:flex; width: 300px;  margin-left:50px;">
+
+									<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">@ccreceiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(ccreceiver, CCList)">
+												<i class="fa fa-window-close fa-2x" aria-hidden="true" style="align-content:center;justify-content: center; display:flex;"></i>
+											</button>
+										</div>
+									}
+								}
+							
+									<p>
+	<textarea @bind="textbox" cols="40" rows="5" style="height:150px; width:90%;"></textarea>
 								</p>
-								<button type="button" class="btn btn-outline-primary rounded-circle" style="width:40px; height:40px" @onclick="() => AddReceiver(InputFrom,receiverList)">
-									<i class="fa fa-plus" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
+						<button type="button" class="btn btn-outline-primary rounded-circle" style="Width:50px; Height:50px;" @onclick="() => SendMail(type,item.Id.ToString(),receiverList,CCList)">
+									<i class="fa fa-paper-plane fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
+								</button>
+								<button type="button" class="btn btn-outline-primary rounded-circle" style="width:50px; height:50px;" @onclick="()=>{isPressed = false; messageid = null; StateHasChanged();}">
+									<i class="fa fa-times fa-2x" aria-hidden="true"></i>
 								</button>
 
 
+
 							</div>
-							<div style="display:flex;">
-								<p>
-									Add CC
-									<input @bind="cc" style="width: 380px; height: 20px;" />
-								</p>
-								<button type="button" class="btn btn-outline-primary rounded-circle" style="width:40px; height:40px" @onclick="() => AddReceiver(cc, CCList)">
-									<i class="fa fa-plus" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
-								</button>
-							</div>
-
-							@if (receiverList != null)
-							{
-								<p>To</p>
-								@foreach (string receiver in receiverList)
-								{
-
-									<div style="display:flex; width: 300px;  margin-left:50px;">
-
-										<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">@receiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(receiver, receiverList)">
-											<i class="fa fa-window-close fa-2x" aria-hidden="true" style="align-content:center;justify-content: center; display:flex;"></i>
-										</button>
-									</div>
-								}
-
-
-							}
-							@if (CCList != null)
-							{
-								<p>CC</p>
-								@foreach (string receiver in CCList)
-								{
-
-									<div style="display:flex; width: 300px;  margin-left:50px;">
-
-										<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">@receiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(receiver, receiverList)">
-											<i class="fa fa-window-close fa-2x" aria-hidden="true" style="align-content:center;justify-content: center; display:flex;"></i>
-										</button>
-									</div>
-								}
-							}
-							<p>
-								Input
-								<input @bind="textbox" style="width: 90%; height: 150px;" />
-							</p>
-
-
-							<button type="button" class="btn btn-outline-primary rounded-circle" style="Width:50px; Height:50px;" @onclick="() => SendReply(item.Id.ToString(),receiverList,CCList)">
-								<i class="fa fa-paper-plane fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
-							</button>
-							<button type="button" class="btn btn-outline-primary rounded-circle" style="width:50px; height:50px;" @onclick="()=>{isPressed = false; messageid = null; StateHasChanged();}">
-								<i class="fa fa-times fa-2x" aria-hidden="true"></i>
-							</button>
-
-
-
-						</div>
-					}
-
-
-					@if (type == "ReplyAll")
-					{
-						<div style="border:3px solid black; margin-top:10px; margin-bottom;10px; margin-left:10px; margin-right:10px; background-color:lightblue;">
-
-							<p>
-								To
-								<input @bind="emailadress" />
-							</p>
-
-							<p>
-								CC
-								<input @bind="cc" />
-							</p>
-							<p>Address List</p>
-							@if (receiverList != null)
-							{
-								<p>To</p>
-
-								@foreach (string receiver in receiverList)
-								{
-									<div style="display:flex; width: 300px;  margin-left:50px;">
-
-										<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">@receiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(receiver, receiverList)">
-											<i class="fa fa-window-close fa-2x" aria-hidden="true" style="align-content:center;justify-content: center; display:flex;"></i>
-										</button>
-									</div>
-								}
-
-
-
-							}
-
-							@if (CCList != null)
-							{
-								<p>CC</p>
-
-								@foreach (string receiver in CCList)
-								{
-									<div style="display:flex; width: 300px;  margin-left:50px;">
-
-										<p style="font-size: 18px; font-family:'Times New Roman', Times, serif;margin-left:10px;">CC @receiver</p> <button type="button" class="btn btn-lg" style="background-color:transparent; width:40px;height:40px; margin-left:auto" @onclick="()=>DeleteReceiver(receiver, CCList)">
-											<i class="fa fa-window-close fa-2x" aria-hidden="true" style="align-content:center;justify-content: center; display:flex;"></i>
-										</button>
-									</div>
-								}
-							}
-							<p>
-								Input
-								<input @bind="textbox" style="width: 90%; height: 150px;" />
-							</p>
-							<button type="button" class="btn btn-outline-primary rounded-circle" style="Width:50px; Height:50px;" @onclick="() => SendReply(item.Id.ToString(),receiverList,CCList)">
-								<i class="fa fa-paper-plane fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i>
-							</button>
-							<button type="button" class="btn btn-outline-primary rounded-circle" style="width:50px; height:50px;" @onclick="()=>{isPressed = false; messageid = null; StateHasChanged();}">
-								<i class="fa fa-times fa-2x" aria-hidden="true"></i>
-							</button>
-
-						</div>
-					}
+						
+					
 				}
 
 			</div>
@@ -276,31 +244,38 @@
 </div>
 
 
-@code{
+@code {
+
+	// Parameters.
 	[Parameter]
 	public Datamodel message { get; set; }
 
 	[Parameter]
 	public ConversationResponse emailChain { get; set; }
 
+	// bool variable for pressing buttons
 	public bool isPressed { get; set; }
 
-
-
-
+	// Variable for showing right history.
 	private ItemId itemidhistory { get; set; }
-	private string emailadress { get; set; }
+
+
+	// Variables for email answering
+	private string email_address { get; set; }
 	private string InputFrom { get; set; }
 	private string cc { get; set; }
 	private string textbox { get; set; }
 	private bool dialogOpen = false;
-	private AuthenticationState authstate;
 	private List<string> receiverList;
 	private List<string> CCList;
 
+	// For getting user role.
 	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
 	private ClaimsPrincipal? user;
+
+	// messageid variable used for showing the answer ui in right place. (in list)
 	private ItemId messageid;
+	// This decides to show or not show history.
 	private int buttonStatus { get; set; }
 	// Timer variable declaration.
 	private static System.Timers.Timer aTimer;
@@ -315,24 +290,61 @@
 	// Timer which is assigned 15 seconds (Updates every 5 seconds).
 	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(10));
 	// bool variable for dialog state.
+	/*
+	@switch (message.colorCode
+	)
+	{
+	case "green":
+	<th style="background-color:green;">
+			@message.solutiondatetime.Date
+		</th>
+		break;
 
+		case "yellow":
+		<th style="background-color:yellow; ">
+			@message.solutiondatetime
+							</th>
 
+						break;
+	case "red":
+		<th style="background-color:red;">
+			@message.solutiondatetime
+		</th>
 
+							break;
+					}*/
+	void SendMail(string typee, ItemId id, List<string> receivers, List<string> ccreceivers)
+	{
+		switch(typee)
+		{
+			case "Reply":
+				SendReply(id, receivers, ccreceivers);
+				break;
+			case "Forward":
+				SendForwardReply(id, receivers, ccreceivers);
 
-	void ReplyButton(ItemId objectid, EmailMessage messageitem, bool isFromMe)
+				break;
+
+			case "ReplyAll":
+				SendReply(id, receivers, ccreceivers);
+				break;
+
+		}
+	}
+	// Reply button function.
+	void ReplyButton(ItemId objectid, EmailMessage messageItem, bool isFromMe)
 	{
 		type = "Reply";
-
 		isPressed = true;
 		messageid = objectid;
 		receiverList = new List<string>();
 		CCList = new List<string>();
 
-		EmailAddress item = messageitem.ToRecipients[0];
-
+		EmailAddress item = messageItem.ToRecipients[0];
+		// Getting receiver to list.
 		if (isFromMe.Equals(false))
 		{
-			receiverList.Add(messageitem.From.Address.ToString());
+			receiverList.Add(messageItem.From.Address.ToString());
 
 
 		}
@@ -345,7 +357,9 @@
 
 
 	}
-	void SendReplyAll(ItemId objectid, EmailMessage messageitem, bool isFromMe)
+
+	// ReplyAll button function.
+	void ReplyButtonAll(ItemId objectid, EmailMessage messageItem, bool isFromMe)
 	{
 		type = "ReplyAll";
 
@@ -353,28 +367,45 @@
 		messageid = objectid;
 		receiverList = new List<string>();
 		CCList = new List<string>();
-		loopdata(messageitem);
+
+		// Loops all receivers for message.
+		LoopData(messageItem);
 
 
 	}
 
+	// ReplyForward button function.
+	private void ReplyButtonForward(ItemId objectid, EmailMessage messageItem, bool isFromMe)
+	{
+		type = "Forward";
 
+		isPressed = true;
+		messageid = objectid;
+		receiverList = new List<string>();
+		CCList = new List<string>();
+
+		// Loops all receivers for message.
+		LoopData(messageItem);
+
+	}
+
+	// Assinging ticket function
 	private async System.Threading.Tasks.Task AssingTickett(string name, string id)
 	{
-
-
-
+		// Email backend function (assingticket).
 		Emailing.AssingTicket(name, id);
 	}
-	private void DeleteReceiver(string receiver, List<string> lista)
+
+	// Delete function for deleting local list strings. (used in receivers/cclist)
+	private void DeleteReceiver(string receiver, List<string> emailList)
 	{
-		lista.Remove(receiver);
+		emailList.Remove(receiver);
 	}
 
 
-	private void AddReceiver(string receiver, List<string> lista)
+	private void AddReceiver(string receiver, List<string> emailList)
 	{
-		if (lista.Contains(receiver))
+		if (emailList.Contains(receiver))
 		{
 
 		}
@@ -383,12 +414,14 @@
 		{
 			if (receiver != "")
 			{
-				lista.Add(receiver);
+				emailList.Add(receiver);
 			}
 
 
 		}
 	}
+
+	// The show history function to set buttonStatus.
 	private void ShowHistory(ItemId itemid)
 	{
 		if (buttonStatus == 1)
@@ -408,66 +441,85 @@
 
 
 
-
-	private async System.Threading.Tasks.Task SendReply(ItemId id, List<string> receivers, List<string> ccreceivers)
+	// Send email forward function. Calls backend function.
+	private async System.Threading.Tasks.Task SendForwardReply(ItemId id, List<string> receivers, List<string> ccreceivers)
 	{
-		// Need's send mail function
+		// Sets local variables to false/null as a email has been sended.
 		isPressed = false;
 		messageid = null;
 
 		StateHasChanged();
 
-		Emailing.SendMail(id, textbox, receivers, ccreceivers);
-		//ItemId id, ObjectId messageconversationid,string type, string addparam, string text, string cc,)
+		// Check to see if receivers are empty (cant send email if there are no receivers).
+		if (receivers != null)
+		{
+			// Backend function to send forward email.
+			Emailing.SendForwardEmail(id, textbox, receivers, ccreceivers);
+		}
+		else
+		{
+			await JSRuntime.InvokeVoidAsync("alert", "Add To receiver!!");
+		}
+		// Settings list's null because email has been send.
 		CCList = null;
 		receiverList = null;
 	}
-	private void SendForwardMessage(ItemId id)
-	{
-		type = "Forward";
 
-		isPressed = true;
-		messageid = null;
-		StateHasChanged();
-
-	}
-	private void ChangeValue()
+	// Reply function.
+	private async System.Threading.Tasks.Task SendReply(ItemId id, List<string> receivers, List<string> ccreceivers)
 	{
+		// Sets local variables to false/null as a email has been sended.
 		isPressed = false;
 		messageid = null;
+
 		StateHasChanged();
 
+		// Check to see if receivers are empty (cant send email if there are no receivers).
+
+		if (receivers != null)
+		{
+			Emailing.SendMail(id, textbox, receivers, ccreceivers);
+		}
+		else
+		{
+			await JSRuntime.InvokeVoidAsync("alert", "Add To receiver!!");
+		}
+		// Settings list's null because email has been send.
+
+		CCList = null;
+		receiverList = null;
 	}
+
+
 
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
-
+		// Getting current user data.
 		var state = await provider;
-		// This is the current logged in user
 		user = state.User;
 
+		// Gets list from backend (inprogress tickets).
 		mongoDbListinProgress = await Emailing.GetMessagesDBInProgressAsync();
 		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
-		mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
-																//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
-		//RunTimer();
+		mongoDbList = await Emailing.GetMessagesDbAsync();
+
 	}
 
-
-	void loopdata(EmailMessage messageitem)
+	// Looping receivers/cclist.
+	void LoopData(EmailMessage messageItem)
 	{
 
-		foreach (EmailAddress item in messageitem.ToRecipients)
+		foreach (EmailAddress item in messageItem.ToRecipients)
 		{
 			receiverList.Add(item.Address);
 
 		}
 
 
-		if (messageitem.CcRecipients.Count().Equals(1))
+		if (messageItem.CcRecipients.Count().Equals(1))
 		{
 
-			foreach (EmailAddress item in messageitem.CcRecipients)
+			foreach (EmailAddress item in messageItem.CcRecipients)
 			{
 				CCList.Add(item.Address.ToString());
 
@@ -475,7 +527,7 @@
 		}
 		else
 		{
-			foreach (EmailAddress item in messageitem.CcRecipients)
+			foreach (EmailAddress item in messageItem.CcRecipients)
 			{
 				CCList.Add(item.Address.ToString());
 			}

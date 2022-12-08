@@ -33,11 +33,13 @@
 <h1>New Tickets (@mongoDbList.Count())</h1>
 
    		
-<Showmailsrazor/>
+<Showmailsrazor mongoDbList="mongoDbList"/>
+<br />
+<br />
 
+<h1>Tickets that are in progress (@mongoDBListInProgress.Count())</h1>
 
-
-
+<Showmailsrazor mongoDbList="mongoDBListInProgress"/>
 <br />
 <br />
 
@@ -47,107 +49,36 @@
 
 
 @code {
-	private string emailadress{get;set;}
-	private string cc{get;set;}
-	private string textbox{ get; set; }
-	private bool dialogOpen = false;
-	private AuthenticationState authstate;
-	bool isPressed = false;
+	private List<Datamodel> mongoDbList;
 
+	private List<Datamodel> mongoDBListInProgress;
+
+	private AuthenticationState authstate;
 	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
 	private ClaimsPrincipal? user;
-	private ItemId messageid;
-
-	// Timer variable declaration.
-	private static System.Timers.Timer aTimer;
-	// This is variable is used to get id of conversation which is later compared to dialog email id.
-	private string emailId;
-	// List which is used to get objects from MongoDB database collection.
-	private List<Datamodel> mongoDbList;
-	//private List<Datamodel> mongoDBListJobsInProgress;
-	private string type;
-	private List<Datamodel> mongoDbListinProgress;
-	// Used to loop email conversation messages.
-	// Timer which is assigned 15 seconds (Updates every 5 seconds).
 	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(10));
-	// bool variable for dialog state.
-	bool ShowPopUp = false;
-
-	ConversationResponse emailChain;
-
-	// This function is called when pressing more information about ticket.
-	private async System.Threading.Tasks.Task CheckData(string id)
-	{
-		// Getting conversation of email to list.
-		emailChain = await Emailing.GetConversion(id);
-		// Assigning id, which is compared later in dialog.
-		emailId = id;
-		// This opens dialog when true.
-		ShowPopUp = true;
-
-	}
-	private async System.Threading.Tasks.Task AssingTickett(string name, string id){
 
 
 
-		Emailing.AssingTicket(name, id);
-	}
 
-
-	/*
-	private async System.Threading.Tasks.Task SendMailReply(string id, string conversationid)
-	{
-		// Need's send mail function
-		isPressed = false;
-		messageid = null;
-		StateHasChanged();
-
-		Emailing.SendMail(id,conversationid, type, "", textbox,"");
-	//ItemId id, ObjectId messageconversationid,string type, string addparam, string text, string cc,)
-	}*/
-	private void SendForwardMessage(ItemId id)
-	{
-		type = "Forward";
-	}
-	private void ChangeValue()
-	{
-		isPressed = false;
-		messageid = null;
-		StateHasChanged();
-
-	}
 
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
+		mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
+		mongoDBListInProgress = await Emailing.GetTicketsInProgress();
+		//	Emailing.GetEmails();
+
+
 		var state = await provider;
 		// This is the current logged in user
 		user = state.User;
 
-		mongoDbListinProgress= await Emailing.GetMessagesDBInProgressAsync();
 		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
-		mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
-																//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
+
 		RunTimer();
+		// Starts 5 second timer													
 	}
 
-
-	void SendMail(ItemId objectid)
-	{		
-		type = "Reply";
-
-		isPressed = true;
-		messageid = objectid;
-
-
-	}
-	void ClosePopup()
-    {
-		// Changes value to false to shutdown dialog module
-		ShowPopUp = false;
-		// Changes website state without reload.
-		StateHasChanged();
-
-	}
 	async void RunTimer()
 	{
 		// Timer function.
@@ -157,7 +88,7 @@
 			// Get new emails and updates list.
 			Emailing.GetEmails();
 			mongoDbList = await Emailing.GetMessagesDbAsync();
-
+			mongoDBListInProgress = await Emailing.GetTicketsInProgress();
 			StateHasChanged();
 
 
@@ -166,117 +97,11 @@
 	}
 
 
-	// Dispose function, maybe needed later.
 	public void Dispose()
 	{
 		periodicTimer?.Dispose();
 	}
 
-	/*	<h1>All tickets in progress (@mongoDbListinProgress.Count())</h1>
-   		<div style="height: 300px;
-    overflow: hidden; overflow-y: scroll; width:55vw; ">
-<table tickettable>
-	 <tr ticketobject>
-    <th>Subject</th>
-    <th>From</th>
-    <th>Time</th>
-	    <th>Handler</th>
-			    <th></th>
-  </tr>
-  
-
-@foreach (Datamodel message in mongoDbListinProgress)
-{
-		<tr subjects>
-		<th>
-			@message.subject
-		</th>
-			<th>
-			@message.sender
-		</th>
-				<th>
-			@message.datetimereceived
-		</th>
-		
-				<th>
-			@message.handler
-		</th>
-		<th style="    padding-left: 10px;">
-			<button class="btn btn-primary" @onclick="() => CheckData(message.message_id.ToString())">Check Info</button>
-		</th>
-
-
-		</tr>
-
-
-		@if (emailChain != null && message.message_id.ToString().Equals(emailId) && ShowPopUp)
-		{
-			<div class="modal" tabindex="-1" dialogbox role="dialog">
-				<div class="modal-dialog modal-lg">
-					<div class="modal-content">
-						<div class="modal-header" style="align-self:center;" >
-						
-
-							
-
-							<h1>
-								@message.subject
-							</h1>
-						
-							
-						</div>
-						<div class="modal-body" id="listitems">
-							
-									
-                            @foreach(ConversationNode node in emailChain.ConversationNodes){
-							
-								@foreach(Item item in node.Items)
-								{
-							
-							var index =@item.TextBody.Text.ToString().IndexOf("_");
-									<div id="divTest" style="border:1px solid black;">
-										<tr>
-											@if (index > 1)
-											{
-											@item.TextBody.Text.Remove(index).ToString();
-
-											}
-											else
-											{
-										@item.TextBody.Text.ToString();
-
-												
-
-											}
-								
-
-									</tr>
-
-									<button type="button" class="close" @onclick="() => SendMail(item.Id)">Forward</button>
-									<button type="button" class="close" @onclick="()=> SendForwardMessage(item.Id)">Forward Message</button>
-
-
-						</div>
-
-
-							
-								}
-							}
-						
-						</div>
-											<button type="button" class="close" @onclick="()=> ClosePopup()"> Close</button>
-
-					</div>
-				</div>
-			</div>
-		
-
-		}
-		}
-</table>
-</div>
-
-*/
 }
 }
 

@@ -81,26 +81,31 @@
     private string? logPassword { get; set; }
 
 
-
+    // Checklogin function.
     private async Task CheckLogin(string username, string password) {
+        // Backend function to check if login is correct.
         LoginModel userAccount = Logging.CheckUserLogin(username, password);
 
 
-
+ 
+        // If success.
         if (userAccount != null)
         {
+            // Using custom authentication, token is given.
             var customAuthenticationProvider = (CustomAuthenticationProvider)authStateProvider;
             await customAuthenticationProvider.UpdateAuthenticationState(new UserSession
                 {
                     UserName = userAccount.username,
                     Role = userAccount.Role
         });
-            navManager.NavigateTo("/", true);
+            navManager.NavigateTo("/tickets", true);
         }
-    else
-    {
+
+        // If fail.
+         else
+         {
         await JSRuntime.InvokeVoidAsync("alert", "Invalid Credentials!");
-    }
+         }
 
      
     }

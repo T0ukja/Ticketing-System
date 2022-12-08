@@ -8,12 +8,8 @@
 @using System.Security.Claims
 @using MongoDB.Bson
 @inject Emails Emailing
-@inject NavigationManager navManager;
 @inject IJSRuntime JSRuntime
 @attribute [Authorize(Roles = "Administrator, HelpDesk")]
-@inject AuthenticationStateProvider authStateProvider;
-@inject AuthenticationStateProvider context;
-
 
 <div >
 
@@ -42,9 +38,9 @@
 
 	async void SendMessage(string message)
 	{
-		// Backend function to send message here
-
+		// Backend function to send message here.
 		Emailing.SendComment(messageid, commentbox, user.Identity.Name);
+		// Refresh state.
 		StateHasChanged();
 
 	}
@@ -53,12 +49,10 @@
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 
 	{
-
+		// Getting current user data.
 		var state = await provider;
-		// This is the current logged in user
 		user = state.User;
-		// Assing messages to list (Checks if there is new unreaded messages available and send them to database).
-																//mongoDbListinProgress = await Emailing.GetInProgressMessagesDBAsync();
+
 	
 	}
 }

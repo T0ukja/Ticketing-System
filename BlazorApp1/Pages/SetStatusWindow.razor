@@ -6,6 +6,7 @@
 @using BlazorApp1.Models;
 @using Microsoft.AspNetCore.Identity;
 @using System.Security.Claims;
+@inject IJSRuntime JSRuntime
 
 @inject Emails Emailing
 @inject AuthenticationStateProvider authStateProvider;
@@ -24,28 +25,63 @@
 	</BSInput>
 
 	<p style="text-align:center;">Write information about status</p>
-	<input @bind="solvebox" style="height:125px; width:325px;" />
-
+	<textarea @bind="solvebox" cols="40" rows="5" style="height:125px; width:325px;"></textarea>
 	<button type="button" class="btn btn-outline-primary" style=" margin-left:10px; margin-top:10px;;" @onclick="()=> SetStatus()">Set Status</button>
 </div>
+
+
+
 @code {
+	//Variables for ui.
 	private string? _value;
 	private string solvebox { get; set; }
+	// Parameter value for getting comments to right message.
 	[Parameter]
 	public string messageid { get; set; }
-	public Datamodel datamodeli;
-	private void SetStatus()
+
+	// Used to get right message/ticket from backend.
+	public Datamodel userDataModel;
+
+	// This is for if status is set from history site (/history).
+	// Just check if if is from history, then backend changes different collection.
+	private bool isHistory = false;
+	private async void SetStatus()
 	{
-		Emailing.SetTicketStatus(_value, solvebox,messageid);
+		if (isHistory)
+		{
+			Emailing.SetTicketStatusHistory(_value, solvebox, messageid);
+			await JSRuntime.InvokeVoidAsync("alert", "Status changed, you can close window now");
+
+		}
+		else
+		{
+			
+		
+			await JSRuntime.InvokeVoidAsync("alert", "Status changed, you can close window now");
+
+			Emailing.SetTicketStatus(_value, solvebox, messageid);
+		}
 	}
 
 
 
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
+		// Getting values from backend.
+		userDataModel = await Emailing.GetTicketStatus(messageid);
+		if(userDataModel != null)
+		{
+			_value = userDataModel.status;
 
-		datamodeli = await Emailing.GetTicketStatus(messageid);
-		_value = datamodeli.status;
+		}
+		else
+		{
+
+			userDataModel = await Emailing.GetTicketStatusFromHistory(messageid);
+			_value = userDataModel.status;
+			isHistory = true;
+
+		}
 
 	}
 }
