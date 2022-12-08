@@ -14,13 +14,11 @@
 @using System.Security.Claims
 @using MongoDB.Bson
 @inject Emails Emailing
-@inject NavigationManager navManager;
 @inject IJSRuntime JSRuntime
 @attribute [Authorize(Roles = "Administrator, HelpDesk")]
 @inject AuthenticationStateProvider authStateProvider;
-@inject AuthenticationStateProvider context;
 
-<div style="height: 300px; ;
+<div style="height: 300px;
     overflow: auto; ">
 	
 	<table style="width: 1550px;">
@@ -103,10 +101,9 @@
 
 			@if (emailChain != null && message.message_id.ToString().Equals(emailId) && ShowPopUp)
 			{
-				dialogOpen = true;
-				<div class="modal" tabindex="-1" dialogbox role="dialog" style="margin-top:50px; height:1200px;">
-					<div class="modal-dialog modal-lg">
-						<div class="modal-content" >
+				<div class="modal" tabindex="-1" dialogbox role="dialog" style="margin-top:50px; ">
+					<div class="modal-dialog modal-lg" >
+						<div class="modal-content">
 
 							<button type="button" class="btn btn-outline-primary rounded-circle" style="width: 55px; height: 55px; margin-left:10px; margin-top:10px;;" @onclick="()=> ClosePopup()"> <i class="fa fa-times fa-2x" aria-hidden="true" style="align-content:center;display: flex; justify-content: center;"></i></button>
 
@@ -135,41 +132,35 @@
 
 
 	private List<Comments> Comments;
-	private string ticketName { get; set; }
-	private ItemId itemidhistory { get; set; }
-	private string emailadress { get; set; }
-	private string InputFrom { get; set; }
-	private string cc { get; set; }
-	private string textbox { get; set; }
-	private bool dialogOpen = false;
-	private AuthenticationState authstate;
 	private bool showMarkStatus = false;
+
+	// Setting
 	private string messageidforwindow { get; set; }
 
-	bool isPressed = false;
-	private List<string> receiverList;
-	private List<string> CCList;
-//	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
+	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
 	private ClaimsPrincipal? user;
-	private ItemId messageid;
-	private int buttonStatus { get; set; }
+
 	// Timer variable declaration.
 	private static System.Timers.Timer aTimer;
+
 	// This is variable is used to get id of conversation which is later compared to dialog email id.
 	private string emailId;
+
 	// List which is used to get objects from MongoDB database collection.
 	[Parameter]
 	public List<Datamodel> mongoDbList { get; set; }
-	//private List<Datamodel> mongoDBListJobsInProgress;
-	private string type;
+	// Used to set type of answering (if reply or replyall/forward). It's local value.
+
+	// List for unreaded emails.
 	private List<NewEmails> unreadedMails;
 	// Used to loop email conversation messages.
-	// Timer which is assigned 15 seconds (Updates every 5 seconds).
+	// Timer which is assigned 10 seconds (Updates every 10 seconds).
 	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(10));
 
 	// bool variable for dialog state.
 	bool ShowPopUp = false;
 
+	// Used to get email conversations.
 	ConversationResponse emailChain;
 
 	// This function is called when pressing more information about ticket.
@@ -184,175 +175,44 @@
 		Emailing.DeleteUnreadedMails(messageconv);
 
 	}
+
+	// Assinging ticket.
 	private async System.Threading.Tasks.Task AssingTicket(string name, string id)
 	{
 
 
 		Emailing.AssingTicket(name, id);
 	}
-	private void DeleteReceiver(string receiver, List<string> lista)
-	{
-		lista.Remove(receiver);
-	}
 
 
+
+
+	// this function is used to popup this Extrawindowmodal (sets value true and ui is showing the ui for Extrawindowmodal)
 	private async System.Threading.Tasks.Task SolveTicket(Datamodel message)
 	{
 		showMarkStatus = true;
-		ticketName = message.subject;
 		messageidforwindow = message.message_id;
 		Comments = await Emailing.GetComments(messageidforwindow);
 
 	}
-	private void AddReceiver(string receiver, List<string> lista)
-	{
-		if (lista.Contains(receiver))
-		{
-
-		}
-
-		else
-		{
-			if (receiver != "")
-			{
-				lista.Add(receiver);
-			}
 
 
-		}
-	}
-	private void ShowHistory(ItemId itemid)
-	{
-		if (buttonStatus == 1)
-		{
-			itemidhistory = itemid;
-			StateHasChanged();
-			buttonStatus = 0;
-		}
-
-		else
-		{
-			itemidhistory = null;
-			StateHasChanged();
-			buttonStatus = 1;
-		}
-	}
-
-
-
-
-	private async System.Threading.Tasks.Task SendReply(ItemId id, List<string> receivers, List<string> ccreceivers)
-	{
-		// Need's send mail function
-		isPressed = false;
-		messageid = null;
-
-		StateHasChanged();
-
-		Emailing.SendMail(id, textbox, receivers,ccreceivers);
-		//ItemId id, ObjectId messageconversationid,string type, string addparam, string text, string cc,)
-		CCList = null;
-		receiverList = null;
-	}
-	private void SendForwardMessage(ItemId id)
-	{
-		type = "Forward";
-
-		isPressed = true;
-		messageid = null;
-		StateHasChanged();
-
-	}
-	private void ChangeValue()
-	{
-		isPressed = false;
-		messageid = null;
-		StateHasChanged();
-
-	}
 
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
-
+		var state = await provider;
+		// This is the current logged in user
+		user = state.User;
 
 		unreadedMails = await Emailing.GetUnreadedMails();
-	}
-	void loopdata(EmailMessage messageitem)
-	{
-
-		foreach (EmailAddress item in messageitem.ToRecipients)
-		{
-			receiverList.Add(item.Address);
-
-		}
-
-
-		if (messageitem.CcRecipients.Count().Equals(1))
-		{
-
-			foreach (EmailAddress item in messageitem.CcRecipients)
-			{
-				CCList.Add(item.Address.ToString());
-
-			}
-		}
-		else
-		{
-			foreach (EmailAddress item in messageitem.CcRecipients)
-			{
-				CCList.Add(item.Address.ToString());
-			}
-		}
-
-
+		RunTimer();
 	}
 
-	void ReplyButton(ItemId objectid, EmailMessage messageitem, bool isFromMe)
-	{
-		type = "Reply";
 
-		isPressed = true;
-		messageid = objectid;
-		receiverList = new List<string>();
-		CCList = new List<string>();
-
-		EmailAddress item = messageitem.ToRecipients[0];
-
-		if (isFromMe.Equals(false))
-		{
-			receiverList.Add(messageitem.From.Address.ToString());
-
-
-		}
-		else
-		{
-			receiverList.Add(item.Address.ToString());
-
-		}
-
-
-
-	}
-	void SendReplyAll(ItemId objectid, EmailMessage messageitem, bool isFromMe)
-	{
-		type = "ReplyAll";
-
-		isPressed = true;
-		messageid = objectid;
-		receiverList = new List<string>();
-		CCList = new List<string>();
-		loopdata(messageitem);
-
-
-	}
 	void ClosePopup()
 	{
 		// Changes value to false to shutdown dialog module
 		ShowPopUp = false;
-
-		// Response view is set to original state (so that it doesn't stay open in background when shutted)
-		isPressed = false;
-		messageid = null;
 		// Changes website state without reload.
 		StateHasChanged();
 

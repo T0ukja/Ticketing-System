@@ -6,13 +6,11 @@
 @using BlazorApp1.Models;
 @using Microsoft.AspNetCore.Identity;
 @using System.Security.Claims;
+@page "/inprogress"
 
 @inject Emails Emailing
-@inject AuthenticationStateProvider authStateProvider;
-@inject AuthenticationStateProvider context;
 @attribute [Authorize(Roles = "Administrator, HelpDesk")]
 
-@page "/inprogress"
 
 
 <style>
@@ -29,15 +27,32 @@
 	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
 	private ClaimsPrincipal? user;
 	private List<Datamodel> historyListTickets;
-	
+	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(5));
+
 
 	protected override async System.Threading.Tasks.Task OnInitializedAsync(){
+		// Getting current user data.
 		var state = await provider;
-		// This is the current logged in user
 		user = state.User;
+
+		// Getting history tickets from backend.
 		historyListTickets = await Emailing.GetMessagesDBInProgressUserAsync(user.Identity.Name.ToString());
 
-
+		RunTimer();
 	}
+	async void RunTimer()
+	{
+		// Timer function.
+		while (await periodicTimer.WaitForNextTickAsync())
+		{
+			// Gets list of tickets.
+			// Get new emails and updates list.
+			historyListTickets = await Emailing.GetMessagesDBInProgressUserAsync(user.Identity.Name.ToString());
 
+			StateHasChanged();
+
+
+
+		}
+	}
 }
