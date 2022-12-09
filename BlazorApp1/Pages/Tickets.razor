@@ -56,7 +56,7 @@
 	private AuthenticationState authstate;
 	[CascadingParameter] private Task<AuthenticationState> provider { get; set; } = default!;
 	private ClaimsPrincipal? user;
-	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(10));
+	PeriodicTimer periodicTimer = new(TimeSpan.FromSeconds(15));
 
 
 
@@ -64,7 +64,7 @@
 
 	protected override async System.Threading.Tasks.Task OnInitializedAsync()
 	{
-		mongoDbList = await Emailing.GetMessagesDbAsync();// Starts 5 second timer
+		mongoDbList = await Emailing.GetMessagesDbAsync();
 		mongoDBListInProgress = await Emailing.GetTicketsInProgress();
 		//	Emailing.GetEmails();
 
