@@ -44,6 +44,8 @@ namespace BlazorApp1.Data
             var options = new UpdateOptions { IsUpsert = true };
             userNameCollection.UpdateOne(filter, update, options);
         }
+
+
 		public bool ChangePassword(string oldpassword, string newpassword, string name)
 		{
             var DBuserLoginData = userNameCollection.Find(m => m.username == name).FirstOrDefault();

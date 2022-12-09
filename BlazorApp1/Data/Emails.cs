@@ -112,17 +112,17 @@ namespace BlazorApp1.Data
             listofemails = emailCollection.Find(_ => true).ToList();
 
 
-            foreach (Datamodel moro in listofemails)
+            foreach (Datamodel email in listofemails)
             {
                 // Create datetime variable from Datamodel object.
-                DateTime ticketdate = moro.datetimereceived;
+                DateTime ticketdate = email.datetimereceived;
 
                 // Comparing datatimes to get hours.
-                var result = (DateTime.UtcNow - moro.datetimereceived).TotalHours;
+                var result = (DateTime.UtcNow - email.datetimereceived).TotalHours;
 
                 // Options/filter to update values.
                 var options = new UpdateOptions { IsUpsert = true };
-                var filter = Builders<Datamodel>.Filter.Eq("_id", moro.id);
+                var filter = Builders<Datamodel>.Filter.Eq("_id", email.id);
 
 
                 // if else to set color code.
@@ -374,7 +374,7 @@ namespace BlazorApp1.Data
                 // Lists emails to list.
                 //   List<Datamodel> emailModel = new List<Datamodel>();
                 Datamodel emailModel = new Datamodel();
-                NewEmails moro = new NewEmails();
+                NewEmails newEmailModel = new NewEmails();
 
                 // Session variable for mongoclient.
                 var session = mongoClient.StartSession();
@@ -416,6 +416,7 @@ namespace BlazorApp1.Data
                             // While loop to check when message is readed, then sends reply mail.
                             while (message.IsRead == false)
                             {
+                                message.Update(ConflictResolutionMode.AutoResolve);
                                 message.Load();
 
                             }
@@ -462,9 +463,9 @@ namespace BlazorApp1.Data
                             }
                             else
                             {
-                                moro.EmailConversationId = message.ConversationId.ToString();
+                                newEmailModel.EmailConversationId = message.ConversationId.ToString();
 
-                                newEmailsCollection.InsertOneAsync(moro);
+                                newEmailsCollection.InsertOneAsync(newEmailModel);
                             }
 
                             message.Update(ConflictResolutionMode.AlwaysOverwrite);
